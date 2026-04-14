@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <springProperty scope="context" name="appName" source="spring.application.name" defaultValue="invoice-platform"/>
+
+    <!-- Dev profile: human-readable console output -->
+    <springProfile name="dev,default">
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${LOG_COLOR_PATTERN:-%clr(%-40.40logger{39}){cyan})}{cyan} %clr(-){faint} %m%n</pattern>
+            </encoder>
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+
+        <logger name="com.shivamingale.invoice" level="DEBUG"/>
+        <logger name="org.springframework.web" level="DEBUG"/>
+        <logger name="org.hibernate.SQL" level="DEBUG"/>
+    </springProfile>
+
+    <!-- Staging profile: plain text, structured-ish -->
+    <springProfile name="staging">
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            </encoder>
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+
+        <logger name="com.shivamingale.invoice" level="INFO"/>
+        <logger name="org.springframework.web" level="WARN"/>
+        <logger name="org.hibernate.SQL" level="WARN"/>
+    </springProfile>
+
+    <!-- Prod profile: JSON structured logging via Logstash encoder -->
+    <springProfile name="prod">
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                <includeMdc>true</includeMdc>
+                <includeContext>true</includeContext>
+                <includeCallerData>false</includeCallerData>
+                <includeStackTrace>true</includeStackTrace>
+                <shortenedLoggerNameLength>36</shortenedLoggerNameLength>
+                <customFields>{"application":"${appName}"}</customFields>
+                <fieldNames>
+                    <timestamp>@timestamp</timestamp>
+                    <version>[ignore]</version>
+                    <levelValue>[ignore]</levelValue>
+                </fieldNames>
+                <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                    <maxDepthPerThrowable>30</maxDepthPerThrowable>
+                    <maxLength>8192</maxLength>
+                    <shortenedClassNameLength>20</shortenedClassNameLength>
+                    <rootCauseFirst>true</rootCauseFirst>
+                    <inlineHash>true</inlineHash>
+                </throwableConverter>
+            </encoder>
+        </appender>
+
+        <!-- Async wrapper: non-blocking writes to console -->
+        <appender name="ASYNC_CONSOLE" class="ch.qos.logback.classic.AsyncAppender">
+            <appender-ref ref="CONSOLE"/>
+            <queueSize>512</queueSize>
+            <discardingThreshold>0</discardingThreshold>
+            <includeCallerData>false</includeCallerData>
+            <neverBlock>true</neverBlock>
+        </appender>
+
+        <root level="WARN">
+            <appender-ref ref="ASYNC_CONSOLE"/>
+        </root>
+
+        <logger name="com.shivamingale.invoice" level="INFO"/>
+        <logger name="org.springframework" level="WARN"/>
+        <logger name="org.hibernate" level="WARN"/>
+        <logger name="org.apache.catalina" level="WARN"/>
+        <logger name="org.apache.tomcat" level="WARN"/>
+    </springProfile>
+</configuration>

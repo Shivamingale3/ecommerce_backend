@@ -1,0 +1,27 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+  flyway:
+    enabled: false
+  h2:
+    console:
+      enabled: true
+
+server:
+  error:
+    include-message: always
+    include-stacktrace: always
+    include-binding-errors: always
+
+logging:
+  level:
+    root: DEBUG
+    com.shivamingale.invoice: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
