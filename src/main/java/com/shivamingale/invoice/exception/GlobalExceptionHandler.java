@@ -131,6 +131,24 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(body);
     }
 
+    @ExceptionHandler(org.springframework.security.authentication.BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentials(
+            org.springframework.security.authentication.BadCredentialsException ex,
+            HttpServletRequest request) {
+        ErrorResponse body =
+                ErrorResponse.builder()
+                        .status(HttpStatus.UNAUTHORIZED.value())
+                        .error("Unauthorized")
+                        .message("Invalid email or password")
+                        .path(request.getRequestURI())
+                        .traceId(getTraceId())
+                        .timestamp(Instant.now())
+                        .build();
+
+        log.warn("Failed login attempt at {}", request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneric(Exception ex, HttpServletRequest request) {
         String traceId = getTraceId();

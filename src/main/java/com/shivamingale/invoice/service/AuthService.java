@@ -72,6 +72,7 @@ public class AuthService {
         return buildAuthResponse(accessToken, refreshToken, user);
     }
 
+    @Transactional(readOnly = true)
     public AuthResponse login(LoginRequest request) {
         Authentication authentication =
                 authenticationManager.authenticate(
@@ -91,6 +92,7 @@ public class AuthService {
         return buildAuthResponse(accessToken, refreshToken, user);
     }
 
+    @Transactional(readOnly = true)
     public AuthResponse refresh(RefreshTokenRequest request) {
         if (!tokenProvider.validateToken(request.getRefreshToken())) {
             throw new IllegalArgumentException("Invalid or expired refresh token");

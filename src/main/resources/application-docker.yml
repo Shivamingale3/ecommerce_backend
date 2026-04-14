@@ -1,0 +1,12 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  flyway:
+    enabled: false
+
+logging:
+  level:
+    root: INFO
+    com.shivamingale.invoice: DEBUG
