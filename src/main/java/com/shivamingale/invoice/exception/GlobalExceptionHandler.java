@@ -23,51 +23,59 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidation(
             MethodArgumentNotValidException ex, HttpServletRequest request) {
-        List<ErrorResponse.FieldError> fieldErrors = ex.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(fe -> ErrorResponse.FieldError.builder()
-                        .field(fe.getField())
-                        .message(fe.getDefaultMessage())
-                        .rejectedValue(fe.getRejectedValue())
-                        .build())
-                .collect(Collectors.toList());
+        List<ErrorResponse.FieldError> fieldErrors =
+                ex.getBindingResult().getFieldErrors().stream()
+                        .map(
+                                fe ->
+                                        ErrorResponse.FieldError.builder()
+                                                .field(fe.getField())
+                                                .message(fe.getDefaultMessage())
+                                                .rejectedValue(fe.getRejectedValue())
+                                                .build())
+                        .collect(Collectors.toList());
 
-        ErrorResponse body = ErrorResponse.builder()
-                .status(HttpStatus.BAD_REQUEST.value())
-                .error("Validation Failed")
-                .message("Request body failed validation")
-                .path(request.getRequestURI())
-                .traceId(getTraceId())
-                .timestamp(Instant.now())
-                .fieldErrors(fieldErrors)
-                .build();
+        ErrorResponse body =
+                ErrorResponse.builder()
+                        .status(HttpStatus.BAD_REQUEST.value())
+                        .error("Validation Failed")
+                        .message("Request body failed validation")
+                        .path(request.getRequestURI())
+                        .traceId(getTraceId())
+                        .timestamp(Instant.now())
+                        .fieldErrors(fieldErrors)
+                        .build();
 
-        log.warn("Validation failed at {}: {} field errors", request.getRequestURI(), fieldErrors.size());
+        log.warn(
+                "Validation failed at {}: {} field errors",
+                request.getRequestURI(),
+                fieldErrors.size());
         return ResponseEntity.badRequest().body(body);
     }
 
     @ExceptionHandler(BindException.class)
     public ResponseEntity<ErrorResponse> handleBindException(
             BindException ex, HttpServletRequest request) {
-        List<ErrorResponse.FieldError> fieldErrors = ex.getFieldErrors()
-                .stream()
-                .map(fe -> ErrorResponse.FieldError.builder()
-                        .field(fe.getField())
-                        .message(fe.getDefaultMessage())
-                        .rejectedValue(fe.getRejectedValue())
-                        .build())
-                .collect(Collectors.toList());
+        List<ErrorResponse.FieldError> fieldErrors =
+                ex.getFieldErrors().stream()
+                        .map(
+                                fe ->
+                                        ErrorResponse.FieldError.builder()
+                                                .field(fe.getField())
+                                                .message(fe.getDefaultMessage())
+                                                .rejectedValue(fe.getRejectedValue())
+                                                .build())
+                        .collect(Collectors.toList());
 
-        ErrorResponse body = ErrorResponse.builder()
-                .status(HttpStatus.BAD_REQUEST.value())
-                .error("Binding Failed")
-                .message("Request binding failed")
-                .path(request.getRequestURI())
-                .traceId(getTraceId())
-                .timestamp(Instant.now())
-                .fieldErrors(fieldErrors)
-                .build();
+        ErrorResponse body =
+                ErrorResponse.builder()
+                        .status(HttpStatus.BAD_REQUEST.value())
+                        .error("Binding Failed")
+                        .message("Request binding failed")
+                        .path(request.getRequestURI())
+                        .traceId(getTraceId())
+                        .timestamp(Instant.now())
+                        .fieldErrors(fieldErrors)
+                        .build();
 
         return ResponseEntity.badRequest().body(body);
     }
@@ -75,14 +83,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFound(
             ResourceNotFoundException ex, HttpServletRequest request) {
-        ErrorResponse body = ErrorResponse.builder()
-                .status(HttpStatus.NOT_FOUND.value())
-                .error("Not Found")
-                .message(ex.getMessage())
-                .path(request.getRequestURI())
-                .traceId(getTraceId())
-                .timestamp(Instant.now())
-                .build();
+        ErrorResponse body =
+                ErrorResponse.builder()
+                        .status(HttpStatus.NOT_FOUND.value())
+                        .error("Not Found")
+                        .message(ex.getMessage())
+                        .path(request.getRequestURI())
+                        .traceId(getTraceId())
+                        .timestamp(Instant.now())
+                        .build();
 
         log.warn("Resource not found: {} at {}", ex.getMessage(), request.getRequestURI());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
@@ -91,14 +100,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessRuleViolationException.class)
     public ResponseEntity<ErrorResponse> handleBusinessRule(
             BusinessRuleViolationException ex, HttpServletRequest request) {
-        ErrorResponse body = ErrorResponse.builder()
-                .status(HttpStatus.UNPROCESSABLE_ENTITY.value())
-                .error("Business Rule Violation")
-                .message(ex.getMessage())
-                .path(request.getRequestURI())
-                .traceId(getTraceId())
-                .timestamp(Instant.now())
-                .build();
+        ErrorResponse body =
+                ErrorResponse.builder()
+                        .status(HttpStatus.UNPROCESSABLE_ENTITY.value())
+                        .error("Business Rule Violation")
+                        .message(ex.getMessage())
+                        .path(request.getRequestURI())
+                        .traceId(getTraceId())
+                        .timestamp(Instant.now())
+                        .build();
 
         log.warn("Business rule violation: {} at {}", ex.getMessage(), request.getRequestURI());
         return ResponseEntity.status(422).body(body);
@@ -107,34 +117,35 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgument(
             IllegalArgumentException ex, HttpServletRequest request) {
-        ErrorResponse body = ErrorResponse.builder()
-                .status(HttpStatus.BAD_REQUEST.value())
-                .error("Bad Request")
-                .message(ex.getMessage())
-                .path(request.getRequestURI())
-                .traceId(getTraceId())
-                .timestamp(Instant.now())
-                .build();
+        ErrorResponse body =
+                ErrorResponse.builder()
+                        .status(HttpStatus.BAD_REQUEST.value())
+                        .error("Bad Request")
+                        .message(ex.getMessage())
+                        .path(request.getRequestURI())
+                        .traceId(getTraceId())
+                        .timestamp(Instant.now())
+                        .build();
 
         log.warn("Illegal argument at {}: {}", request.getRequestURI(), ex.getMessage());
         return ResponseEntity.badRequest().body(body);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneric(
-            Exception ex, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleGeneric(Exception ex, HttpServletRequest request) {
         String traceId = getTraceId();
 
         log.error("Unhandled exception at {} [traceId={}]", request.getRequestURI(), traceId, ex);
 
-        ErrorResponse body = ErrorResponse.builder()
-                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .error("Internal Server Error")
-                .message("An unexpected error occurred. Please try again later.")
-                .path(request.getRequestURI())
-                .traceId(traceId)
-                .timestamp(Instant.now())
-                .build();
+        ErrorResponse body =
+                ErrorResponse.builder()
+                        .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                        .error("Internal Server Error")
+                        .message("An unexpected error occurred. Please try again later.")
+                        .path(request.getRequestURI())
+                        .traceId(traceId)
+                        .timestamp(Instant.now())
+                        .build();
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
