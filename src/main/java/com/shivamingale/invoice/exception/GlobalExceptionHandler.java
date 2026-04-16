@@ -102,7 +102,7 @@ public class GlobalExceptionHandler {
             BusinessRuleViolationException ex, HttpServletRequest request) {
         ErrorResponse body =
                 ErrorResponse.builder()
-                        .status(HttpStatus.UNPROCESSABLE_ENTITY.value())
+                        .status(HttpStatus.UNPROCESSABLE_CONTENT.value())
                         .error("Business Rule Violation")
                         .message(ex.getMessage())
                         .path(request.getRequestURI())
