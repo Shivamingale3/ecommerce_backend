@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration scan="true" scanPeriod="30 seconds">
+<configuration>
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 
     <springProperty scope="context" name="appName" source="spring.application.name" defaultValue="invoice-platform"/>
 
     <!-- Dev profile: human-readable console output -->
-    <springProfile name="dev,default">
+    <springProfile name="dev,default,docker">
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <encoder>
                 <pattern>%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${LOG_COLOR_PATTERN:-%clr(%-40.40logger{39}){cyan})}{cyan} %clr(-){faint} %m%n</pattern>

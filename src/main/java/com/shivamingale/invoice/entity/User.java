@@ -1,6 +1,8 @@
 package com.shivamingale.invoice.entity;
 
 import com.shivamingale.invoice.enums.Role;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -41,7 +43,7 @@ public class User extends BaseEntity {
     @Builder.Default
     private Role role = Role.USER;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "tenant_id", nullable = false)
     private Tenant tenant;
 
