@@ -12,7 +12,6 @@ import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.UUID;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,9 +43,9 @@ public class JwtTokenProvider {
         Date expiry = new Date(now.getTime() + expirationMs);
 
         return Jwts.builder()
-                .subject(user.getId().toString())
+                .subject(user.getId())
                 .claim("email", user.getEmail())
-                .claim("tenantId", user.getTenant().getId().toString())
+                .claim("tenantId", user.getTenant().getId())
                 .claim("role", user.getRole().name())
                 .claim("firstName", user.getFirstName())
                 .claim("lastName", user.getLastName())
@@ -78,16 +77,16 @@ public class JwtTokenProvider {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
     }
 
-    public UUID getUserId(String token) {
-        return UUID.fromString(parseClaims(token).getSubject());
+    public String getUserId(String token) {
+        return parseClaims(token).getSubject();
     }
 
     public String getEmail(String token) {
         return parseClaims(token).get("email", String.class);
     }
 
-    public UUID getTenantId(String token) {
-        return UUID.fromString(parseClaims(token).get("tenantId", String.class));
+    public String getTenantId(String token) {
+        return parseClaims(token).get("tenantId", String.class);
     }
 
     public String getRole(String token) {

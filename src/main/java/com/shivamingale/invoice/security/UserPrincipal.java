@@ -3,7 +3,6 @@ package com.shivamingale.invoice.security;
 import com.shivamingale.invoice.entity.User;
 import com.shivamingale.invoice.enums.Role;
 import java.util.Collection;
-import java.util.UUID;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -12,8 +11,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Getter
 public class UserPrincipal implements UserDetails {
 
-    private final UUID id;
-    private final UUID tenantId;
+    private final String id;
+    private final String tenantId;
     private final String email;
     private final String password;
     private final String firstName;

@@ -13,7 +13,6 @@ import com.shivamingale.invoice.repository.TenantRepository;
 import com.shivamingale.invoice.repository.UserRepository;
 import com.shivamingale.invoice.security.JwtTokenProvider;
 import com.shivamingale.invoice.security.UserPrincipal;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -98,7 +97,7 @@ public class AuthService {
             throw new IllegalArgumentException("Invalid or expired refresh token");
         }
 
-        UUID userId = tokenProvider.getUserId(request.getRefreshToken());
+        String userId = tokenProvider.getUserId(request.getRefreshToken());
         User user = userRepository.findById(userId).orElseThrow();
 
         if (!user.isEnabled()) {

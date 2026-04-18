@@ -8,7 +8,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -38,8 +37,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
                 Claims claims = tokenProvider.parseClaims(jwt);
 
-                UUID userId = UUID.fromString(claims.getSubject());
-                UUID tenantId = UUID.fromString(claims.get("tenantId", String.class));
+                String userId = claims.getSubject();
+                String tenantId = claims.get("tenantId", String.class);
                 String email = claims.get("email", String.class);
                 String roleStr = claims.get("role", String.class);
                 String firstName = claims.get("firstName", String.class);

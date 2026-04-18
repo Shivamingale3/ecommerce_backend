@@ -1,16 +1,14 @@
 package com.shivamingale.invoice.security;
 
-import java.util.UUID;
-
 public class TenantContext {
 
-    private static final ThreadLocal<UUID> currentTenant = new ThreadLocal<>();
+    private static final ThreadLocal<String> currentTenant = new ThreadLocal<>();
 
-    public static void setTenantId(UUID tenantId) {
+    public static void setTenantId(String tenantId) {
         currentTenant.set(tenantId);
     }
 
-    public static UUID getTenantId() {
+    public static String getTenantId() {
         return currentTenant.get();
     }
 
