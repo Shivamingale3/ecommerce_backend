@@ -25,8 +25,6 @@ spring:
         format_sql: true
         jdbc:
           time_zone: UTC
-  flyway:
-    enabled: false
   mail:
     host: ${SPRING_MAIL_HOST:smtp.example.com}
     port: ${SPRING_MAIL_PORT:587}

@@ -6,9 +6,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-  flyway:
-    enabled: false
-  h2:
+    h2:
     console:
       enabled: true
 
