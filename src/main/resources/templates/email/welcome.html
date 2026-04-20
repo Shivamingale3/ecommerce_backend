@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Welcome to Mirra</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #2D2926; background-color: #FEFCFB; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #FEFCFB;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; background-color: #FFFFFF;">
+
+                    <!-- Header -->
+                    <tr>
+                        <td align="center" style="padding: 40px 30px 30px 30px; background: linear-gradient(135deg, #FAF7F5 0%, #F5F0ED 100%);">
+                            <a href="#" style="display: inline-block; text-decoration: none;">
+                                <span style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 32px; font-weight: 600; color: #8B5A5A; letter-spacing: 0.05em;">Mirra</span>
+                            </a>
+                        </td>
+                    </tr>
+
+                    <!-- Welcome Badge -->
+                    <tr>
+                        <td style="padding: 30px 50px 10px 50px; text-align: center;">
+                            <span style="display: inline-block; background-color: rgba(212, 165, 165, 0.2); color: #8B5A5A; padding: 8px 20px; border-radius: 50px; font-size: 12px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;">
+                                Welcome
+                            </span>
+                        </td>
+                    </tr>
+
+                    <!-- Hero Section -->
+                    <tr>
+                        <td style="padding: 20px 50px 10px 50px; text-align: center;">
+                            <h1 style="margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 36px; font-weight: 500; color: #2D2926; line-height: 1.2;">
+                                Welcome, <span th:text="${firstName}">Sarah</span>!
+                            </h1>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 10px 50px 30px 50px; text-align: center;">
+                            <p style="margin: 0; font-size: 16px; color: #6B6560; max-width: 400px; margin: 0 auto;">
+                                Thank you for joining Mirra. We're thrilled to have you as part of our curated fashion community.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Content Card -->
+                    <tr>
+                        <td style="padding: 0 50px 30px 50px;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background: linear-gradient(135deg, #FAF7F5 0%, #F5F0ED 100%); border-radius: 16px;">
+                                <tr>
+                                    <td style="padding: 40px;">
+                                        <!-- Feature Items -->
+                                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                            <tr>
+                                                <td style="padding-bottom: 24px;">
+                                                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                                        <tr>
+                                                            <td width="48" style="vertical-align: top;">
+                                                                <div style="width: 40px; height: 40px; background-color: #D4A5A5; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                                                    </svg>
+                                                                </div>
+                                                            </td>
+                                                            <td style="vertical-align: top; padding-left: 16px;">
+                                                                <h3 style="margin: 0 0 4px 0; font-size: 16px; font-weight: 600; color: #2D2926;">Curated Collections</h3>
+                                                                <p style="margin: 0; font-size: 14px; color: #6B6560;">Discover elegant dresses, trendy tops, and stylish accessories handpicked for the modern woman.</p>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-bottom: 24px;">
+                                                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                                        <tr>
+                                                            <td width="48" style="vertical-align: top;">
+                                                                <div style="width: 40px; height: 40px; background-color: #8B5A5A; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                        <circle cx="12" cy="12" r="10"/>
+                                                                        <polyline points="12 6 12 12 16 14"/>
+                                                                    </svg>
+                                                                </div>
+                                                            </td>
+                                                            <td style="vertical-align: top; padding-left: 16px;">
+                                                                <h3 style="margin: 0 0 4px 0; font-size: 16px; font-weight: 600; color: #2D2926;">Exclusive Offers</h3>
+                                                                <p style="margin: 0; font-size: 14px; color: #6B6560;">Be the first to know about new arrivals, seasonal sales, and members-only discounts.</p>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                                        <tr>
+                                                            <td width="48" style="vertical-align: top;">
+                                                                <div style="width: 40px; height: 40px; background-color: #C49B9B; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                                                                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                                                                        <line x1="12" y1="22.08" x2="12" y2="12"/>
+                                                                    </svg>
+                                                                </div>
+                                                            </td>
+                                                            <td style="vertical-align: top; padding-left: 16px;">
+                                                                <h3 style="margin: 0 0 4px 0; font-size: 16px; font-weight: 600; color: #2D2926;">Seamless Tracking</h3>
+                                                                <p style="margin: 0; font-size: 14px; color: #6B6560;">Track your orders in real-time and receive updates every step of the way.</p>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- CTA Button -->
+                    <tr>
+                        <td style="padding: 0 50px 30px 50px; text-align: center;">
+                            <a th:href="${verificationUrl}" href="#" style="display: inline-block; background-color: #8B5A5A; color: #FFFFFF; padding: 16px 40px; border-radius: 8px; font-size: 16px; font-weight: 500; text-decoration: none; transition: background-color 0.3s ease;">
+                                Verify Your Email
+                            </a>
+                        </td>
+                    </tr>
+
+                    <!-- Note -->
+                    <tr>
+                        <td style="padding: 0 50px 30px 50px; text-align: center;">
+                            <p style="margin: 0; font-size: 13px; color: #9B9590; max-width: 400px; margin: 0 auto;">
+                                If you didn't create an account with Mirra, you can safely ignore this email. The verification link will expire in 24 hours.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Divider -->
+                    <tr>
+                        <td style="padding: 0 50px;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                <tr>
+                                    <td style="border-top: 1px solid #E8E2DE;"></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 30px 50px 40px 50px; background-color: #FAF7F5;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                <tr>
+                                    <td style="text-align: center;">
+                                        <p style="margin: 0 0 8px 0; font-size: 14px; color: #6B6560;">
+                                            You're receiving this email because you signed up for Mirra.
+                                        </p>
+                                        <p style="margin: 0 0 16px 0; font-size: 14px; color: #6B6560;">
+                                            <a href="#" style="color: #8B5A5A; text-decoration: none;">Manage Preferences</a>
+                                            &nbsp;&bull;&nbsp;
+                                            <a href="#" style="color: #8B5A5A; text-decoration: none;">Unsubscribe</a>
+                                        </p>
+                                        <p style="margin: 0; font-size: 12px; color: #9B9590;">
+                                            &copy; <span th:text="${currentYear}">2026</span> Mirra. All rights reserved.
+                                        </p>
+                                        <p style="margin: 8px 0 0 0; font-size: 12px; color: #9B9590;">
+                                            123 Fashion Avenue, Mumbai, Maharashtra 400001
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

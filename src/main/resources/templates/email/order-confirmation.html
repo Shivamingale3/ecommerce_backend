@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Order Confirmed</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #2D2926; background-color: #FEFCFB; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #FEFCFB;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; background-color: #FFFFFF;">
+
+                    <!-- Header -->
+                    <tr>
+                        <td align="center" style="padding: 40px 30px 30px 30px; background: linear-gradient(135deg, #FAF7F5 0%, #F5F0ED 100%);">
+                            <a href="#" style="display: inline-block; text-decoration: none;">
+                                <span style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 32px; font-weight: 600; color: #8B5A5A; letter-spacing: 0.05em;">Mirra</span>
+                            </a>
+                        </td>
+                    </tr>
+
+                    <!-- Success Badge -->
+                    <tr>
+                        <td style="padding: 30px 50px 10px 50px; text-align: center;">
+                            <span style="display: inline-block; background-color: rgba(123, 160, 140, 0.15); color: #7BA08C; padding: 8px 20px; border-radius: 50px; font-size: 12px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;">
+                                Order Confirmed
+                            </span>
+                        </td>
+                    </tr>
+
+                    <!-- Title Section -->
+                    <tr>
+                        <td style="padding: 20px 50px 10px 50px; text-align: center;">
+                            <h1 style="margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 32px; font-weight: 500; color: #2D2926; line-height: 1.2;">
+                                Thank You, <span th:text="${firstName}">Sarah</span>!
+                            </h1>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 10px 50px 30px 50px; text-align: center;">
+                            <p style="margin: 0; font-size: 16px; color: #6B6560; max-width: 400px; margin: 0 auto;">
+                                Your order has been confirmed and will be shipped soon. We've sent you a tracking number once it's on its way.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Order Details Card -->
+                    <tr>
+                        <td style="padding: 0 50px 30px 50px;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #FAF7F5; border-radius: 16px; border: 1px solid #E8E2DE;">
+                                <tr>
+                                    <td style="padding: 30px;">
+                                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                            <!-- Order Number -->
+                                            <tr>
+                                                <td style="padding-bottom: 20px; border-bottom: 1px solid #E8E2DE;">
+                                                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                                        <tr>
+                                                            <td>
+                                                                <span style="font-size: 12px; color: #9B9590; text-transform: uppercase; letter-spacing: 0.1em;">Order Number</span>
+                                                                <p style="margin: 4px 0 0 0; font-size: 20px; font-weight: 600; color: #2D2926; font-family: 'DM Sans', monospace;" th:text="${orderId}">#MRR-2024-001</p>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+
+                                            <!-- Order Info Row -->
+                                            <tr>
+                                                <td style="padding: 20px 0;">
+                                                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                                        <tr>
+                                                            <td width="50%">
+                                                                <span style="font-size: 12px; color: #9B9590; text-transform: uppercase; letter-spacing: 0.1em;">Order Date</span>
+                                                                <p style="margin: 4px 0 0 0; font-size: 14px; font-weight: 500; color: #2D2926;" th:text="${orderDate}">March 15, 2024</p>
+                                                            </td>
+                                                            <td width="50%">
+                                                                <span style="font-size: 12px; color: #9B9590; text-transform: uppercase; letter-spacing: 0.1em;">Estimated Delivery</span>
+                                                                <p style="margin: 4px 0 0 0; font-size: 14px; font-weight: 500; color: #2D2926;" th:text="${deliveryDate}">March 18-20, 2024</p>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+
+                                            <!-- Total -->
+                                            <tr>
+                                                <td>
+                                                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                                        <tr>
+                                                            <td>
+                                                                <span style="font-size: 12px; color: #9B9590; text-transform: uppercase; letter-spacing: 0.1em;">Total Amount</span>
+                                                                <p style="margin: 4px 0 0 0; font-size: 24px; font-weight: 600; color: #8B5A5A;" th:text="${totalAmount}">₹4,999</p>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- CTA Button -->
+                    <tr>
+                        <td style="padding: 0 50px 30px 50px; text-align: center;">
+                            <a href="#" style="display: inline-block; background-color: #8B5A5A; color: #FFFFFF; padding: 16px 48px; border-radius: 8px; font-size: 16px; font-weight: 500; text-decoration: none; transition: background-color 0.3s ease; box-shadow: 0 4px 6px rgba(139, 90, 90, 0.2);">
+                                View Order Details
+                            </a>
+                        </td>
+                    </tr>
+
+                    <!-- What's Next -->
+                    <tr>
+                        <td style="padding: 0 50px 30px 50px;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                <tr>
+                                    <td style="padding-bottom: 16px;">
+                                        <h3 style="margin: 0; font-size: 16px; font-weight: 600; color: #2D2926;">What happens next?</h3>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                            <tr>
+                                                <td width="32" style="vertical-align: top; padding-top: 2px;">
+                                                    <div style="width: 24px; height: 24px; background-color: #D4A5A5; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                                        <span style="color: #FFFFFF; font-size: 12px; font-weight: 600;">1</span>
+                                                    </div>
+                                                </td>
+                                                <td style="padding-left: 12px; padding-bottom: 16px;">
+                                                    <p style="margin: 0; font-size: 14px; color: #6B6560;"><strong style="color: #2D2926;">Order Processing</strong> - We're preparing your items with care.</p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="32" style="vertical-align: top; padding-top: 2px;">
+                                                    <div style="width: 24px; height: 24px; background-color: #D4A5A5; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                                        <span style="color: #FFFFFF; font-size: 12px; font-weight: 600;">2</span>
+                                                    </div>
+                                                </td>
+                                                <td style="padding-left: 12px; padding-bottom: 16px;">
+                                                    <p style="margin: 0; font-size: 14px; color: #6B6560;"><strong style="color: #2D2926;">Quality Check</strong> - Every piece is inspected before shipping.</p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="32" style="vertical-align: top; padding-top: 2px;">
+                                                    <div style="width: 24px; height: 24px; background-color: #D4A5A5; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                                        <span style="color: #FFFFFF; font-size: 12px; font-weight: 600;">3</span>
+                                                    </div>
+                                                </td>
+                                                <td style="padding-left: 12px;">
+                                                    <p style="margin: 0; font-size: 14px; color: #6B6560;"><strong style="color: #2D2926;">Shipped to You</strong> - We'll email you tracking details.</p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Divider -->
+                    <tr>
+                        <td style="padding: 0 50px;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                <tr>
+                                    <td style="border-top: 1px solid #E8E2DE;"></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 30px 50px 40px 50px; background-color: #FAF7F5;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                <tr>
+                                    <td style="text-align: center;">
+                                        <p style="margin: 0 0 8px 0; font-size: 14px; color: #6B6560;">
+                                            Questions? Reply to this email or contact us at <a href="mailto:support@mirra.com" style="color: #8B5A5A; text-decoration: none;">support@mirra.com</a>
+                                        </p>
+                                        <p style="margin: 0 0 16px 0; font-size: 14px; color: #6B6560;">
+                                            <a href="#" style="color: #8B5A5A; text-decoration: none;">Manage Preferences</a>
+                                            &nbsp;&bull;&nbsp;
+                                            <a href="#" style="color: #8B5A5A; text-decoration: none;">Unsubscribe</a>
+                                        </p>
+                                        <p style="margin: 0; font-size: 12px; color: #9B9590;">
+                                            &copy; <span th:text="${currentYear}">2026</span> Mirra. All rights reserved.
+                                        </p>
+                                        <p style="margin: 8px 0 0 0; font-size: 12px; color: #9B9590;">
+                                            123 Fashion Avenue, Mumbai, Maharashtra 400001
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

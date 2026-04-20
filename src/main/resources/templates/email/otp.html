@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Your Sign-In Code</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #2D2926; background-color: #FEFCFB; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #FEFCFB;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; background-color: #FFFFFF;">
+
+                    <!-- Header -->
+                    <tr>
+                        <td align="center" style="padding: 40px 30px 30px 30px; background: linear-gradient(135deg, #FAF7F5 0%, #F5F0ED 100%);">
+                            <a href="#" style="display: inline-block; text-decoration: none;">
+                                <span style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 32px; font-weight: 600; color: #8B5A5A; letter-spacing: 0.05em;">Mirra</span>
+                            </a>
+                        </td>
+                    </tr>
+
+                    <!-- Key Icon -->
+                    <tr>
+                        <td style="padding: 30px 50px 10px 50px; text-align: center;">
+                            <div style="width: 72px; height: 72px; background: linear-gradient(135deg, #8B5A5A 0%, #D4A5A5 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+                                </svg>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Title Section -->
+                    <tr>
+                        <td style="padding: 20px 50px 10px 50px; text-align: center;">
+                            <h1 style="margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 32px; font-weight: 500; color: #2D2926; line-height: 1.2;">
+                                Your Sign-In Code
+                            </h1>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 10px 50px 30px 50px; text-align: center;">
+                            <p style="margin: 0; font-size: 16px; color: #6B6560; max-width: 400px; margin: 0 auto;">
+                                Hi <span th:text="${firstName}">Sarah</span>, enter this code to sign in to your Mirra account.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- OTP Code Card -->
+                    <tr>
+                        <td style="padding: 0 50px 30px 50px;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background: linear-gradient(135deg, #8B5A5A 0%, #B8888A 100%); border-radius: 20px;">
+                                <tr>
+                                    <td style="padding: 40px; text-align: center;">
+                                        <p style="margin: 0 0 8px 0; font-size: 12px; color: rgba(255, 255, 255, 0.8); text-transform: uppercase; letter-spacing: 0.15em;">
+                                            Your One-Time Password
+                                        </p>
+                                        <p style="margin: 0; font-size: 42px; font-weight: 700; color: #FFFFFF; letter-spacing: 0.2em; font-family: 'DM Sans', 'SF Mono', 'Consolas', monospace;" th:text="${otp}">8 4 2 9 1 7</p>
+                                        <p style="margin: 20px 0 0 0; font-size: 13px; color: rgba(255, 255, 255, 0.7);">
+                                            Valid for <strong th:text="${expiryMinutes}">10</strong> minutes
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Security Notice -->
+                    <tr>
+                        <td style="padding: 0 50px 30px 50px;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: rgba(196, 122, 122, 0.08); border-radius: 12px; border-left: 4px solid #C47A7A;">
+                                <tr>
+                                    <td style="padding: 20px;">
+                                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                            <tr>
+                                                <td width="28" style="vertical-align: top; padding-top: 2px;">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C47A7A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                                    </svg>
+                                                </td>
+                                                <td style="padding-left: 12px;">
+                                                    <p style="margin: 0; font-size: 14px; color: #6B6560;">
+                                                        <strong style="color: #2D2926;">Security Notice:</strong> Never share this code with anyone. Our team will never ask for your OTP.
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Didn't Request Warning -->
+                    <tr>
+                        <td style="padding: 0 50px 30px 50px; text-align: center;">
+                            <p style="margin: 0; font-size: 14px; color: #9B9590; max-width: 400px; margin: 0 auto;">
+                                If you didn't request this code, you can safely ignore this email. Someone may have entered your email by mistake.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Divider -->
+                    <tr>
+                        <td style="padding: 0 50px;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                <tr>
+                                    <td style="border-top: 1px solid #E8E2DE;"></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 30px 50px 40px 50px; background-color: #FAF7F5;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                <tr>
+                                    <td style="text-align: center;">
+                                        <p style="margin: 0 0 8px 0; font-size: 14px; color: #6B6560;">
+                                            You're receiving this email because of a sign-in attempt.
+                                        </p>
+                                        <p style="margin: 0 0 16px 0; font-size: 14px; color: #6B6560;">
+                                            <a href="#" style="color: #8B5A5A; text-decoration: none;">Manage Preferences</a>
+                                            &nbsp;&bull;&nbsp;
+                                            <a href="#" style="color: #8B5A5A; text-decoration: none;">Unsubscribe</a>
+                                        </p>
+                                        <p style="margin: 0; font-size: 12px; color: #9B9590;">
+                                            &copy; <span th:text="${currentYear}">2026</span> Mirra. All rights reserved.
+                                        </p>
+                                        <p style="margin: 8px 0 0 0; font-size: 12px; color: #9B9590;">
+                                            123 Fashion Avenue, Mumbai, Maharashtra 400001
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
