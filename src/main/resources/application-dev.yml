@@ -9,12 +9,26 @@ spring:
     h2:
     console:
       enabled: true
+  mail:
+    properties:
+      mail:
+        smtp:
+          starttls:
+            require: false
+          ssl:
+            trust: "*"
+  mail-custom:
+    health-check-enabled: true
 
 server:
   error:
     include-message: always
     include-stacktrace: always
     include-binding-errors: always
+
+cookie:
+  secure: false
+  same-site: Lax
 
 logging:
   level:

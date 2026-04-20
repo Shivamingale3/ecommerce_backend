@@ -3,7 +3,17 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: false
-  
+
+  mail:
+    properties:
+      mail:
+        smtp:
+          ssl:
+            trust: "*"
+
+mail-custom:
+  health-check-enabled: false
+
 logging:
   level:
     root: INFO

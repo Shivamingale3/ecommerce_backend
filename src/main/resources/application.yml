@@ -36,6 +36,10 @@ spring:
           auth: true
           starttls:
             enable: true
+  mail-custom:
+    from: ${MAIL_FROM:noreply@example.com}
+    from-name: ${MAIL_FROM_NAME:Invoice Platform}
+    health-check-enabled: true
 
 server:
   port: ${SERVER_PORT:8080}
@@ -79,9 +83,25 @@ management:
       probes:
         enabled: true
 
+# Cookie configuration
+cookie:
+  access-token-name: ${COOKIE_ACCESS_TOKEN_NAME:access_token}
+  refresh-token-name: ${COOKIE_REFRESH_TOKEN_NAME:refresh_token}
+  path: /
+  access-token-max-age: ${COOKIE_ACCESS_TOKEN_MAX_AGE:86400}
+  refresh-token-max-age: ${COOKIE_REFRESH_TOKEN_MAX_AGE:604800}
+  http-only: true
+  secure: ${COOKIE_SECURE:false}
+  same-site: Strict
+
 logging:
   level:
     root: INFO
     com.shivamingale.invoice: DEBUG
     org.springframework.web: INFO
     org.hibernate.SQL: WARN
+
+# Trace/debug configuration
+app:
+  trace:
+    enabled: ${APP_TRACE_ENABLED:false}
