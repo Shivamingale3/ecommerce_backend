@@ -28,6 +28,14 @@ public class CookieService {
                 cookieProperties.getRefreshTokenMaxAge());
     }
 
+    public void setAdminAccessTokenCookie(HttpServletResponse response, String token) {
+        setCookie(response, "admin_access_token", token, cookieProperties.getAccessTokenMaxAge());
+    }
+
+    public void setAdminRefreshTokenCookie(HttpServletResponse response, String token) {
+        setCookie(response, "admin_refresh_token", token, cookieProperties.getRefreshTokenMaxAge());
+    }
+
     public void clearAccessTokenCookie(HttpServletResponse response) {
         setCookie(response,
                 cookieProperties.getAccessTokenName(),

@@ -80,6 +80,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        return uri.startsWith("/api/v1/admin") || uri.startsWith("/api/v1/public");
+    }
+
     private String extractJwtFromRequest(HttpServletRequest request) {
         // First check cookies for access token
         Cookie[] cookies = request.getCookies();

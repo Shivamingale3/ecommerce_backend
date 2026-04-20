@@ -1,5 +1,6 @@
 package com.shivamingale.ecom.config;
 
+import com.shivamingale.ecom.security.AdminJwtAuthenticationFilter;
 import com.shivamingale.ecom.security.JwtAuthenticationEntryPoint;
 import com.shivamingale.ecom.security.JwtAuthenticationFilter;
 import java.util.List;
@@ -31,6 +32,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final AdminJwtAuthenticationFilter adminJwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final UserDetailsService userDetailsService;
 
@@ -46,18 +48,28 @@ public class SecurityConfig {
                                 "/api/v1/auth/request-otp",
                                 "/api/v1/auth/verify-otp",
                                 "/api/v1/auth/refresh",
+                                "/api/v1/admin/auth/request-otp",
+                                "/api/v1/admin/auth/verify-otp",
+                                "/api/v1/admin/auth/refresh",
+                                "/api/v1/public/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
                                 "/actuator/health",
                                 "/actuator/info")
                                 .permitAll()
+                                .requestMatchers("/api/v1/admin/**")
+                                .hasRole("ADMIN")
+                                .requestMatchers("/api/v1/app/**")
+                                .authenticated()
                                 .requestMatchers("/actuator/**")
                                 .hasRole("ADMIN")
                                 .anyRequest()
                                 .authenticated())
                 .addFilterBefore(
                         jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(
+                        adminJwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
