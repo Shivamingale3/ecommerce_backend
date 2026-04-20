@@ -1,113 +1,96 @@
 package com.shivamingale.invoice.service;
 
-import com.shivamingale.invoice.config.JwtProperties;
-import com.shivamingale.invoice.dto.request.LoginRequest;
-import com.shivamingale.invoice.dto.request.RefreshTokenRequest;
-import com.shivamingale.invoice.dto.request.RegisterRequest;
-import com.shivamingale.invoice.dto.response.AuthResponse;
-import com.shivamingale.invoice.dto.response.UserResponse;
-import com.shivamingale.invoice.entity.Tenant;
-import com.shivamingale.invoice.entity.User;
-import com.shivamingale.invoice.enums.Role;
-import com.shivamingale.invoice.repository.TenantRepository;
-import com.shivamingale.invoice.repository.UserRepository;
-import com.shivamingale.invoice.security.JwtTokenProvider;
-import com.shivamingale.invoice.security.UserPrincipal;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import java.time.Instant;
+import java.util.Map;
+import java.util.Random;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.shivamingale.invoice.dto.request.RefreshTokenRequest;
+import com.shivamingale.invoice.dto.request.SignInRequestDto;
+import com.shivamingale.invoice.dto.request.VerifySignInOtpRequest;
+import com.shivamingale.invoice.dto.response.UserResponse;
+import com.shivamingale.invoice.entity.SignInRequest;
+import com.shivamingale.invoice.entity.User;
+import com.shivamingale.invoice.exception.AppException;
+import com.shivamingale.invoice.repository.SignInRequestRepository;
+import com.shivamingale.invoice.security.JwtTokenProvider;
+import com.shivamingale.invoice.security.UserPrincipal;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UserRepository userRepository;
-    private final TenantRepository tenantRepository;
-    private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
-    private final JwtProperties jwtProperties;
-    private final AuthenticationManager authenticationManager;
+
+    @Autowired
+    private EmailTemplateService emailTemplateService;
+
+    @Autowired
+    private SignInRequestRepository signInRequestRepository;
+
+    @Autowired
+    private UserService userService;
 
     @Transactional
-    public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email already registered: " + request.getEmail());
+    public Map<String, String> verifySignInOtp(VerifySignInOtpRequest request) {
+        SignInRequest signInRequest = signInRequestRepository.findById(request.getRequestId())
+                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Invalid Request ID", null));
+
+        if (signInRequest.getValidTill().isBefore(Instant.now())) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "OTP has expired", null);
         }
 
-        // Create tenant for the new organization
-        Tenant tenant =
-                Tenant.builder()
-                        .name(request.getCompanyName())
-                        .ownerEmail(request.getEmail())
-                        .build();
-        tenant = tenantRepository.save(tenant);
+        if (!signInRequest.getOtp().equals(request.getOtp())) {
+            throw new AppException(HttpStatus.FORBIDDEN, "Invalid OTP", null);
+        }
 
-        // Create the first admin user for this tenant
-        User user =
-                User.builder()
-                        .firstName(request.getFirstName())
-                        .lastName(request.getLastName())
-                        .email(request.getEmail())
-                        .password(passwordEncoder.encode(request.getPassword()))
-                        .role(Role.ADMIN)
-                        .tenant(tenant)
-                        .enabled(true)
-                        .accountNonLocked(true)
-                        .build();
-        user = userRepository.save(user);
+        User user = userService.getUserByEmail(signInRequest.getEmail())
+                .orElseGet(() -> userService.registerNewUser(signInRequest.getEmail(), null, null));
 
-        String accessToken = tokenProvider.generateAccessToken(user);
-        String refreshToken = tokenProvider.generateRefreshToken(user);
+        return Map.of("accessToken", tokenProvider.generateAccessToken(user), "refreshToken",
+                tokenProvider.generateRefreshToken(user));
+    }
 
-        log.info("New user registered: {} [tenant={}]", user.getEmail(), tenant.getName());
-
-        return buildAuthResponse(accessToken, refreshToken, user);
+    @Transactional
+    public String requestSignInOtp(SignInRequestDto request) {
+        String otp = generateOTP();
+        SignInRequest signInRequest = signInRequestRepository.save(SignInRequest.builder()
+                .email(request.getEmail())
+                .otp(otp)
+                .build());
+        try {
+            emailTemplateService.sendOtpEmail(request.getEmail(), "User", otp, 5);
+        } catch (Exception e) {
+            log.warn("Failed to send OTP email to {}: {}. OTP is: {}", request.getEmail(), e.getMessage(), otp);
+        }
+        log.info("{} has requested to sign in! OTP stored: {}", request.getEmail(), otp);
+        return signInRequest.getId();
     }
 
     @Transactional(readOnly = true)
-    public AuthResponse login(LoginRequest request) {
-        Authentication authentication =
-                authenticationManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(
-                                request.getEmail(), request.getPassword()));
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
-        User user = userRepository.findById(principal.getId()).orElseThrow();
-
-        String accessToken = tokenProvider.generateAccessToken(user);
-        String refreshToken = tokenProvider.generateRefreshToken(user);
-
-        log.info("User logged in: {}", user.getEmail());
-
-        return buildAuthResponse(accessToken, refreshToken, user);
-    }
-
-    @Transactional(readOnly = true)
-    public AuthResponse refresh(RefreshTokenRequest request) {
+    public Map<String, String> refresh(RefreshTokenRequest request) {
         if (!tokenProvider.validateToken(request.getRefreshToken())) {
-            throw new IllegalArgumentException("Invalid or expired refresh token");
+            throw new AppException(HttpStatus.UNAUTHORIZED, "Invalid or expired refresh token", null);
         }
 
         String userId = tokenProvider.getUserId(request.getRefreshToken());
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userService.getUserById(userId)
+                .orElseThrow(() -> new AppException(HttpStatus.UNAUTHORIZED, "Invalid Refresh Token", null));
 
         if (!user.isEnabled()) {
-            throw new IllegalArgumentException("User account is disabled");
+            throw new AppException(HttpStatus.FORBIDDEN, "Your account has been disabled", null);
         }
 
-        String accessToken = tokenProvider.generateAccessToken(user);
-        String refreshToken = tokenProvider.generateRefreshToken(user);
-
-        return buildAuthResponse(accessToken, refreshToken, user);
+        return Map.of("accessToken", tokenProvider.generateAccessToken(user), "refreshToken",
+                tokenProvider.generateRefreshToken(user));
     }
 
     public UserResponse getCurrentUser(UserPrincipal principal) {
@@ -116,26 +99,12 @@ public class AuthService {
                 .email(principal.getEmail())
                 .firstName(principal.getFirstName())
                 .lastName(principal.getLastName())
-                .role(principal.getRole())
                 .build();
     }
 
-    private AuthResponse buildAuthResponse(String accessToken, String refreshToken, User user) {
-        return AuthResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .tokenType("Bearer")
-                .expiresIn(jwtProperties.getExpirationMs() / 1000)
-                .user(
-                        UserResponse.builder()
-                                .id(user.getId())
-                                .email(user.getEmail())
-                                .firstName(user.getFirstName())
-                                .lastName(user.getLastName())
-                                .companyName(user.getTenant().getName())
-                                .role(user.getRole())
-                                .createdAt(user.getCreatedAt())
-                                .build())
-                .build();
+    private String generateOTP() {
+        Random random = new Random();
+        int otp = 100000 + random.nextInt(900000);
+        return String.valueOf(otp);
     }
 }

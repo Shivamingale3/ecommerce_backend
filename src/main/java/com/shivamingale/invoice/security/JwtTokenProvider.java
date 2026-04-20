@@ -45,10 +45,6 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .subject(user.getId())
                 .claim("email", user.getEmail())
-                .claim("tenantId", user.getTenant().getId())
-                .claim("role", user.getRole().name())
-                .claim("firstName", user.getFirstName())
-                .claim("lastName", user.getLastName())
                 .issuedAt(now)
                 .expiration(expiry)
                 .signWith(secretKey)
@@ -83,13 +79,5 @@ public class JwtTokenProvider {
 
     public String getEmail(String token) {
         return parseClaims(token).get("email", String.class);
-    }
-
-    public String getTenantId(String token) {
-        return parseClaims(token).get("tenantId", String.class);
-    }
-
-    public String getRole(String token) {
-        return parseClaims(token).get("role", String.class);
     }
 }

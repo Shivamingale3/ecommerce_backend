@@ -6,6 +6,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Instant;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -24,16 +26,15 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
             throws IOException {
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
 
-        ErrorResponse error =
-                ErrorResponse.builder()
-                        .status(HttpServletResponse.SC_UNAUTHORIZED)
-                        .error("Unauthorized")
-                        .message("Authentication required. Please provide a valid Bearer token.")
-                        .path(request.getRequestURI())
-                        .timestamp(Instant.now())
-                        .build();
+        ErrorResponse error = ErrorResponse.builder()
+                .status(HttpStatus.UNAUTHORIZED)
+                .error("Unauthorized")
+                .message("Authentication required. Please provide a valid Bearer token.")
+                .path(request.getRequestURI())
+                .timestamp(Instant.now())
+                .build();
 
         objectMapper.findAndRegisterModules();
         objectMapper.writeValue(response.getOutputStream(), error);
