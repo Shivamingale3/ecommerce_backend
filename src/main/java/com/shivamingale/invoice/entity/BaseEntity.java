@@ -35,4 +35,7 @@ public abstract class BaseEntity {
 
     @Version
     private Long version;
+
+    @Column(name = "is_deleted", nullable = false, columnDefinition = "boolean default false")
+    private Boolean isDeleted = false;
 }
