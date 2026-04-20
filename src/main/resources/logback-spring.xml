@@ -16,7 +16,7 @@
             <appender-ref ref="CONSOLE"/>
         </root>
 
-        <logger name="com.shivamingale.invoice" level="DEBUG"/>
+        <logger name="com.shivamingale.ecom" level="DEBUG"/>
         <logger name="org.springframework.web" level="DEBUG"/>
         <logger name="org.hibernate.SQL" level="DEBUG"/>
     </springProfile>
@@ -33,7 +33,7 @@
             <appender-ref ref="CONSOLE"/>
         </root>
 
-        <logger name="com.shivamingale.invoice" level="INFO"/>
+        <logger name="com.shivamingale.ecom" level="INFO"/>
         <logger name="org.springframework.web" level="WARN"/>
         <logger name="org.hibernate.SQL" level="WARN"/>
     </springProfile>
@@ -76,7 +76,7 @@
             <appender-ref ref="ASYNC_CONSOLE"/>
         </root>
 
-        <logger name="com.shivamingale.invoice" level="INFO"/>
+        <logger name="com.shivamingale.ecom" level="INFO"/>
         <logger name="org.springframework" level="WARN"/>
         <logger name="org.hibernate" level="WARN"/>
         <logger name="org.apache.catalina" level="WARN"/>

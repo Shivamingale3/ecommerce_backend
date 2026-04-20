@@ -19,7 +19,7 @@ cookie:
 logging:
   level:
     root: WARN
-    com.shivamingale.invoice: INFO
+    com.shivamingale.ecom: INFO
     org.springframework: WARN
     org.hibernate: WARN
   pattern:
