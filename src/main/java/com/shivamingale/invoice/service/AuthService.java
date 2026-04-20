@@ -45,7 +45,7 @@ public class AuthService {
         SignInRequest signInRequest = signInRequestRepository.findById(request.getRequestId())
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Invalid Request ID", null));
 
-        if (signInRequest.getValidTill().isBefore(Instant.now())) {
+        if (signInRequest.getValidTill().isAfter(Instant.now())) {
             throw new AppException(HttpStatus.BAD_REQUEST, "OTP has expired", null);
         }
 
@@ -56,6 +56,8 @@ public class AuthService {
         User user = userService.getUserByEmail(signInRequest.getEmail())
                 .orElseGet(() -> userService.registerNewUser(signInRequest.getEmail(), null, null));
 
+        signInRequestRepository.delete(signInRequest);
+
         return Map.of("accessToken", tokenProvider.generateAccessToken(user), "refreshToken",
                 tokenProvider.generateRefreshToken(user));
     }
@@ -65,10 +67,11 @@ public class AuthService {
 
         Optional<SignInRequest> existingRequest = signInRequestRepository.findByEmail(request.getEmail());
 
-        if (existingRequest.isPresent() && existingRequest.get().getValidTill().isBefore(Instant.now())) {
-            return Map.of("requestId", existingRequest.get().getId(), "validTill",
-                    existingRequest.get().getValidTill().toString());
-        } else {
+        if (existingRequest.isPresent()) {
+            if (existingRequest.get().getValidTill().isAfter(Instant.now())) {
+                return Map.of("requestId", existingRequest.get().getId(), "validTill",
+                        existingRequest.get().getValidTill().toString());
+            }
             signInRequestRepository.delete(existingRequest.get());
         }
 

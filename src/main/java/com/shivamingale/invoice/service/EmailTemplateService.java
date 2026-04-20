@@ -40,7 +40,7 @@ public class EmailTemplateService {
                 "verificationUrl", verificationUrl,
                 "currentYear", LocalDateTime.now().getYear()
         );
-        sendTemplateEmail(to, "Welcome to Mirra", "email/welcome", variables);
+        sendTemplateEmail(to, "Welcome to Mirra", "welcome", variables);
     }
 
     public void sendEmailVerification(String to, String firstName, String verificationUrl) {
@@ -50,7 +50,7 @@ public class EmailTemplateService {
                 "expiryHours", 24,
                 "currentYear", LocalDateTime.now().getYear()
         );
-        sendTemplateEmail(to, "Verify Your Email Address", "email/email-verification", variables);
+        sendTemplateEmail(to, "Verify Your Email Address", "email-verification", variables);
     }
 
     public void sendPasswordResetEmail(String to, String firstName, String resetUrl, String expiryHours) {
@@ -60,7 +60,7 @@ public class EmailTemplateService {
                 "expiryHours", expiryHours,
                 "currentYear", LocalDateTime.now().getYear()
         );
-        sendTemplateEmail(to, "Reset Your Password", "email/password-reset", variables);
+        sendTemplateEmail(to, "Reset Your Password", "password-reset", variables);
     }
 
     public void sendOrderConfirmation(
@@ -81,7 +81,7 @@ public class EmailTemplateService {
                 "currentYear", currentYear,
                 "orderItems", orderItems
         );
-        sendTemplateEmail(to, "Order Confirmed - #" + orderId, "email/order-confirmation", variables);
+        sendTemplateEmail(to, "Order Confirmed - #" + orderId, "order-confirmation", variables);
     }
 
     public void sendOrderShipped(
@@ -101,7 +101,7 @@ public class EmailTemplateService {
                 "trackingUrl", trackingUrl,
                 "currentYear", LocalDateTime.now().getYear()
         );
-        sendTemplateEmail(to, "Your Order Has Shipped - #" + orderId, "email/order-shipped", variables);
+        sendTemplateEmail(to, "Your Order Has Shipped - #" + orderId, "order-shipped", variables);
     }
 
     public void sendContactInquiryReply(
@@ -115,7 +115,7 @@ public class EmailTemplateService {
                 "ticketNumber", ticketNumber,
                 "currentYear", LocalDateTime.now().getYear()
         );
-        sendTemplateEmail(to, "We Received Your Inquiry - " + inquirySubject, "email/contact-reply", variables);
+        sendTemplateEmail(to, "We Received Your Inquiry - " + inquirySubject, "contact-reply", variables);
     }
 
     public void sendOtpEmail(String to, String firstName, String otp, int expiryMinutes) {
@@ -125,7 +125,7 @@ public class EmailTemplateService {
                 "expiryMinutes", expiryMinutes,
                 "currentYear", LocalDateTime.now().getYear()
         );
-        sendTemplateEmail(to, "Your Sign-In Code", "email/otp", variables);
+        sendTemplateEmail(to, "Your Sign-In Code", "otp", variables);
     }
 
     private void sendTemplateEmail(

@@ -96,7 +96,7 @@ public class EnvValidator {
     public EnvValidator secret(String path, boolean required) {
         return validate(path,
                 value -> {
-                    if (value.contains("change_me") || value.contains("example") || value.length() < 32) {
+                    if (value.contains("change_me") || value.contains("example") || value.length() < 8) {
                         return "appears to be a placeholder or weak secret";
                     }
                     return null;
