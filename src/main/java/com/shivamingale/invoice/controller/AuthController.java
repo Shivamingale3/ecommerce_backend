@@ -38,9 +38,9 @@ public class AuthController {
     @PostMapping("/request-otp")
     public ResponseEntity<AppResponse<Map<String, String>>> requestSignInOtp(
             @Valid @RequestBody SignInRequestDto request) {
-        String requestId = authService.requestSignInOtp(request);
+        Map<String, String> result = authService.requestSignInOtp(request);
         return ResponseEntity
-                .ok(AppResponse.success(Map.of("requestId", requestId), "OTP sent successfully", HttpStatus.OK));
+                .ok(AppResponse.success(result, "OTP sent successfully", HttpStatus.OK));
     }
 
     @PostMapping("/verify-otp")

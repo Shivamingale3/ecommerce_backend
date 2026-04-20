@@ -2,6 +2,7 @@ package com.shivamingale.invoice.service;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +61,17 @@ public class AuthService {
     }
 
     @Transactional
-    public String requestSignInOtp(SignInRequestDto request) {
+    public Map<String, String> requestSignInOtp(SignInRequestDto request) {
+
+        Optional<SignInRequest> existingRequest = signInRequestRepository.findByEmail(request.getEmail());
+
+        if (existingRequest.isPresent() && existingRequest.get().getValidTill().isBefore(Instant.now())) {
+            return Map.of("requestId", existingRequest.get().getId(), "validTill",
+                    existingRequest.get().getValidTill().toString());
+        } else {
+            signInRequestRepository.delete(existingRequest.get());
+        }
+
         String otp = generateOTP();
         SignInRequest signInRequest = signInRequestRepository.save(SignInRequest.builder()
                 .email(request.getEmail())
@@ -72,7 +83,7 @@ public class AuthService {
             log.warn("Failed to send OTP email to {}: {}. OTP is: {}", request.getEmail(), e.getMessage(), otp);
         }
         log.info("{} has requested to sign in! OTP stored: {}", request.getEmail(), otp);
-        return signInRequest.getId();
+        return Map.of("requestId", signInRequest.getId(), "validTill", signInRequest.getValidTill().toString());
     }
 
     @Transactional(readOnly = true)
