@@ -45,7 +45,7 @@ public class AuthService {
         SignInRequest signInRequest = signInRequestRepository.findById(request.getRequestId())
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Invalid Request ID", null));
 
-        if (signInRequest.getValidTill().isAfter(Instant.now())) {
+        if (signInRequest.getValidTill().isBefore(Instant.now())) {
             throw new AppException(HttpStatus.BAD_REQUEST, "OTP has expired", null);
         }
 
