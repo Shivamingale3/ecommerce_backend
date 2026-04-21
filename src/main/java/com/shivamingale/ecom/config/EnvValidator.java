@@ -7,12 +7,9 @@ import java.util.Map;
 import java.util.function.Function;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 
 public class EnvValidator {
-
-    private static final Logger log = LoggerFactory.getLogger(EnvValidator.class);
 
     private final List<ValidationError> errors = new ArrayList<>();
     private final Map<String, Object> capturedValues = new HashMap<>();
@@ -70,9 +67,10 @@ public class EnvValidator {
         capturedValues.put(path, value != null ? value : "");
         if (required && isBlank(value)) {
             errors.add(new ValidationError(path, "required"));
-        } else if (!isBlank(value)) {
-            if (!value.equalsIgnoreCase("true") && !value.equalsIgnoreCase("false") && !value.equalsIgnoreCase("yes")
-                    && !value.equalsIgnoreCase("no")) {
+        } else if (value != null && !value.trim().isEmpty()) {
+            String lower = value.toLowerCase();
+            if (!lower.equals("true") && !lower.equals("false") && !lower.equals("yes")
+                    && !lower.equals("no")) {
                 errors.add(new ValidationError(path, "must be 'true' or 'false'"));
             }
         }
