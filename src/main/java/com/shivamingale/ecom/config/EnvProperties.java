@@ -49,4 +49,10 @@ public class EnvProperties {
     private String mailFrom;
     private String mailFromName;
     private String mailCustomHealthCheckEnabled;
+
+    // ==================== CORS ====================
+    private String corsAllowedOrigins;
+    private String corsAllowedMethods;
+    private String corsAllowedHeaders;
+    private Boolean corsAllowCredentials;
 }

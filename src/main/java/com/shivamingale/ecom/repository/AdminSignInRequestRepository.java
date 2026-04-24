@@ -8,4 +8,6 @@ import com.shivamingale.ecom.entity.AdminSignInRequest;
 @Repository
 public interface AdminSignInRequestRepository extends JpaRepository<AdminSignInRequest, String> {
     Optional<AdminSignInRequest> findByEmail(String email);
+
+    Optional<AdminSignInRequest> findByEmailAndId(String email, String id);
 }

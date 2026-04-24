@@ -47,6 +47,10 @@ services:
       ADMIN_EMAIL: ${ADMIN_EMAIL:-}
       ADMIN_NAME: ${ADMIN_NAME:-}
       ADMIN_MOBILE: ${ADMIN_MOBILE:-}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:?required}
+      CORS_ALLOWED_METHODS: ${CORS_ALLOWED_METHODS:?required}
+      CORS_ALLOWED_HEADERS: ${CORS_ALLOWED_HEADERS:?required}
+      CORS_ALLOW_CREDENTIALS: ${CORS_ALLOW_CREDENTIALS:?required}
     healthcheck:
       test:
         [

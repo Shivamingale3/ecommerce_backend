@@ -2,7 +2,6 @@ package com.shivamingale.ecom.service;
 
 import java.time.Instant;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,32 +27,47 @@ public class AdminAuthService {
     private final AdminSignInRequestRepository signInRequestRepository;
 
     @Autowired
-    private com.shivamingale.ecom.service.EmailTemplateService emailTemplateService;
+    private EmailTemplateService emailTemplateService;
 
     @Transactional
     public Map<String, String> requestSignInOtp(String email) {
-        Optional<AdminSignInRequest> existing = signInRequestRepository.findByEmail(email);
-        if (existing.isPresent()) {
-            if (existing.get().getValidTill().isAfter(Instant.now())) {
-                return Map.of("requestId", existing.get().getId(), "validTill",
-                        existing.get().getValidTill().toString());
-            }
-            signInRequestRepository.delete(existing.get());
+        Admin admin = adminRepository.findByEmail(email)
+                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Admin not found", null));
+        if (!admin.isEnabled()) {
+            throw new AppException(HttpStatus.FORBIDDEN, "Admin account is disabled", null);
         }
+
+        // 1 email = 1 OTP request — always delete any existing request
+        signInRequestRepository.findByEmail(email).ifPresent(signInRequestRepository::delete);
+
         String otp = String.valueOf((int) (Math.random() * 899999) + 100000);
         AdminSignInRequest req = signInRequestRepository
                 .save(AdminSignInRequest.builder().email(email).otp(otp).build());
         try {
             emailTemplateService.sendOtpEmail(email, "Admin", otp, 5);
         } catch (Exception e) {
-            log.warn("Failed to send admin OTP to {}: {}. OTP: {}", email, e.getMessage(), otp);
+            log.error("Failed to send admin OTP to {}: {}", email, e.getMessage());
+            throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send OTP email", null);
         }
-        log.info("Admin OTP requested for {}: {}", email, otp);
-        return Map.of("requestId", req.getId(), "validTill", req.getValidTill().toString());
+        log.info("Admin OTP requested for {}", email);
+        return Map.of("requestId", req.getId(), "validTill", req.getValidTill().toString(), "email", email);
+    }
+
+    @Transactional
+    public Map<String, String> resendSignInOtp(String email, String requestId) {
+        // Validate the existing request belongs to this email
+        signInRequestRepository.findByEmailAndId(email, requestId).orElseThrow(
+                () -> new AppException(HttpStatus.NOT_FOUND, "Invalid Request ID or Email", null));
+
+        // Delete old and create fresh OTP
+        return requestSignInOtp(email);
     }
 
     @Transactional
     public Map<String, String> verifySignInOtp(String requestId, String otp) {
+        if (otp == null || otp.isBlank()) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "OTP is required", null);
+        }
         AdminSignInRequest req = signInRequestRepository.findById(requestId)
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Invalid Request ID", null));
         if (req.getValidTill().isBefore(Instant.now()))

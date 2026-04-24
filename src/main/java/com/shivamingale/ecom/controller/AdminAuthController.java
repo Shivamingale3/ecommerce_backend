@@ -4,6 +4,9 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +41,19 @@ public class AdminAuthController {
                 AppResponse.success(adminAuthService.requestSignInOtp(email), "OTP sent successfully", HttpStatus.OK));
     }
 
+    @PostMapping("/resend-otp")
+    public ResponseEntity<AppResponse<Map<String, String>>> resendOtp(
+            @Valid @RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String requestId = request.get("requestId");
+        if (email == null || email.isBlank())
+            throw new AppException(HttpStatus.BAD_REQUEST, "Email is required", null);
+        if (requestId == null || requestId.isBlank())
+            throw new AppException(HttpStatus.BAD_REQUEST, "Request ID is required", null);
+        return ResponseEntity.ok(
+                AppResponse.success(adminAuthService.resendSignInOtp(email, requestId), "OTP resent successfully", HttpStatus.OK));
+    }
+
     @PostMapping("/verify-otp")
     public ResponseEntity<AppResponse<Void>> verifyOtp(@Valid @RequestBody VerifySignInOtpRequest request,
             HttpServletResponse response) {
@@ -69,5 +85,18 @@ public class AdminAuthController {
         if (requestBody != null && requestBody.getRefreshToken() != null)
             return requestBody.getRefreshToken();
         throw new AppException(HttpStatus.BAD_REQUEST, "Refresh token is required", null);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<AppResponse<UserDetails>> getProfile(@AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(AppResponse.success(userDetails, "Profile fetched successfully", HttpStatus.OK));
+    }
+
+    @PostMapping("/sign-out")
+    public ResponseEntity<AppResponse<Void>> signOut(HttpServletRequest request,
+            HttpServletResponse response) {
+        cookieService.setAdminAccessTokenCookie(response, null);
+        cookieService.setAdminRefreshTokenCookie(response, null);
+        return ResponseEntity.ok(AppResponse.success(null, "Signed out successfully", HttpStatus.OK));
     }
 }

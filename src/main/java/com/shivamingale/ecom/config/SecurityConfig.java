@@ -1,10 +1,8 @@
 package com.shivamingale.ecom.config;
 
-import com.shivamingale.ecom.security.AdminJwtAuthenticationFilter;
-import com.shivamingale.ecom.security.JwtAuthenticationEntryPoint;
-import com.shivamingale.ecom.security.JwtAuthenticationFilter;
+import java.util.Arrays;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,6 +23,12 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.shivamingale.ecom.security.AdminJwtAuthenticationFilter;
+import com.shivamingale.ecom.security.JwtAuthenticationEntryPoint;
+import com.shivamingale.ecom.security.JwtAuthenticationFilter;
+
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -35,6 +39,7 @@ public class SecurityConfig {
     private final AdminJwtAuthenticationFilter adminJwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final UserDetailsService userDetailsService;
+    private final EnvProperties envProperties;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -47,8 +52,10 @@ public class SecurityConfig {
                         auth -> auth.requestMatchers(
                                 "/api/v1/auth/request-otp",
                                 "/api/v1/auth/verify-otp",
+                                "/api/v1/auth/resend-otp",
                                 "/api/v1/auth/refresh",
                                 "/api/v1/admin/auth/request-otp",
+                                "/api/v1/admin/auth/resend-otp",
                                 "/api/v1/admin/auth/verify-otp",
                                 "/api/v1/admin/auth/refresh",
                                 "/api/v1/public/**",
@@ -76,11 +83,31 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of());
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Trace-Id"));
+
+        String origins = envProperties.getCorsAllowedOrigins();
+        if (origins != null && !origins.isBlank()) {
+            config.setAllowedOrigins(Arrays.asList(origins.split(",")));
+        }
+
+        String methods = envProperties.getCorsAllowedMethods();
+        if (methods != null && !methods.isBlank()) {
+            config.setAllowedMethods(Arrays.asList(methods.split(",")));
+        } else {
+            config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        }
+
+        String headers = envProperties.getCorsAllowedHeaders();
+        if (headers != null && !headers.isBlank()) {
+            config.setAllowedHeaders(Arrays.asList(headers.split(",")));
+        } else {
+            config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Trace-Id"));
+        }
+
         config.setExposedHeaders(List.of("X-Trace-Id"));
-        config.setAllowCredentials(false);
+
+        Boolean allowCredentials = envProperties.getCorsAllowCredentials();
+        config.setAllowCredentials(allowCredentials != null ? allowCredentials : false);
+
         config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
