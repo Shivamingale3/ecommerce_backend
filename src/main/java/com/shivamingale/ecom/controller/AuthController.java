@@ -68,7 +68,7 @@ public class AuthController {
 
         String refreshToken = extractRefreshToken(request, requestBody);
 
-        Map<String, String> tokens = authService.refresh(new RefreshTokenRequest(refreshToken));
+        Map<String, String> tokens = authService.refresh(refreshToken);
         cookieService.setAccessTokenCookie(response, tokens.get("accessToken"));
         cookieService.setRefreshTokenCookie(response, tokens.get("refreshToken"));
         return ResponseEntity

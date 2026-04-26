@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.shivamingale.ecom.dto.request.RefreshTokenRequest;
 import com.shivamingale.ecom.dto.request.SignInRequestDto;
 import com.shivamingale.ecom.dto.request.VerifySignInOtpRequest;
 import com.shivamingale.ecom.dto.response.UserResponse;
@@ -90,12 +89,12 @@ public class AuthService {
     }
 
     @Transactional(readOnly = true)
-    public Map<String, String> refresh(RefreshTokenRequest request) {
-        if (!tokenProvider.validateToken(request.getRefreshToken())) {
+    public Map<String, String> refresh(String refreshToken) {
+        if (!tokenProvider.validateToken(refreshToken)) {
             throw new AppException(HttpStatus.UNAUTHORIZED, "Invalid or expired refresh token", null);
         }
 
-        String userId = tokenProvider.getUserId(request.getRefreshToken());
+        String userId = tokenProvider.getUserId(refreshToken);
         User user = userService.getUserById(userId)
                 .orElseThrow(() -> new AppException(HttpStatus.UNAUTHORIZED, "Invalid Refresh Token", null));
 

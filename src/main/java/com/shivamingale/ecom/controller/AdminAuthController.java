@@ -65,7 +65,7 @@ public class AdminAuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<AppResponse<Void>> refresh(
-            @Valid @RequestBody(required = false) RefreshTokenRequest requestBody, HttpServletRequest request,
+            @RequestBody(required = false) RefreshTokenRequest requestBody, HttpServletRequest request,
             HttpServletResponse response) {
         String refreshToken = extractRefreshToken(request, requestBody);
         Map<String, String> tokens = adminAuthService.refresh(refreshToken);
