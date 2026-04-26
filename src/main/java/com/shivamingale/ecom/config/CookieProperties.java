@@ -15,6 +15,13 @@ public class CookieProperties {
     private int accessTokenMaxAge = 86400;
     private int refreshTokenMaxAge = 604800;
     private boolean httpOnly = true;
-    private boolean secure = true;
-    private String sameSite = "Strict";
+    private boolean secure = false;
+    private String sameSite;
+
+    public String getSameSite() {
+        if (sameSite != null && !sameSite.isBlank()) {
+            return sameSite;
+        }
+        return secure ? "Strict" : "Lax";
+    }
 }
