@@ -62,7 +62,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "wget -qO- http://localhost:8080/actuator/health || exit 1",
+          "wget -qO- http://localhost:8080/actuator/health/liveness || exit 1",
         ]
       interval: 300s
       timeout: 10s

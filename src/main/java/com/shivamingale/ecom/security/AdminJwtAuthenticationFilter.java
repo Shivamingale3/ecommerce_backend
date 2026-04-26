@@ -38,6 +38,7 @@ public class AdminJwtAuthenticationFilter extends OncePerRequestFilter {
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
                 Claims claims = tokenProvider.parseClaims(jwt);
                 if (!"admin".equals(claims.get("type", String.class))) {
+                    // Not an admin token — pass through without setting auth
                     filterChain.doFilter(request, response);
                     return;
                 }
@@ -52,8 +53,11 @@ public class AdminJwtAuthenticationFilter extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
-        } catch (Exception ex) { log.warn("Admin auth failed: {}", ex.getMessage()); }
-        finally { filterChain.doFilter(request, response); }
+            filterChain.doFilter(request, response);
+        } catch (Exception ex) {
+            log.warn("Admin auth failed: {}", ex.getMessage());
+            filterChain.doFilter(request, response);
+        }
     }
 
     private String extractJwtFromRequest(HttpServletRequest request) {
