@@ -31,14 +31,14 @@ public class AdminAuthService {
 
     @Transactional
     public Map<String, String> requestSignInOtp(String email) {
-        Admin admin = adminRepository.findByEmail(email)
+        Admin admin = adminRepository.findByEmailAndDeletedFalse(email)
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Admin not found", null));
         if (!admin.isEnabled()) {
             throw new AppException(HttpStatus.FORBIDDEN, "Admin account is disabled", null);
         }
 
         // 1 email = 1 OTP request — always delete any existing request
-        signInRequestRepository.findByEmail(email).ifPresent(signInRequestRepository::delete);
+        signInRequestRepository.findByEmailAndDeletedFalse(email).ifPresent(signInRequestRepository::delete);
 
         String otp = String.valueOf((int) (Math.random() * 899999) + 100000);
         AdminSignInRequest req = signInRequestRepository
@@ -56,8 +56,11 @@ public class AdminAuthService {
     @Transactional
     public Map<String, String> resendSignInOtp(String email, String requestId) {
         // Validate the existing request belongs to this email
-        signInRequestRepository.findByEmailAndId(email, requestId).orElseThrow(
-                () -> new AppException(HttpStatus.NOT_FOUND, "Invalid Request ID or Email", null));
+        AdminSignInRequest existingReq = signInRequestRepository.findByIdAndDeletedFalse(requestId)
+                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Invalid Request ID", null));
+        if (!existingReq.getEmail().equals(email)) {
+            throw new AppException(HttpStatus.NOT_FOUND, "Invalid Request ID or Email", null);
+        }
 
         // Delete old and create fresh OTP
         return requestSignInOtp(email);
@@ -74,7 +77,7 @@ public class AdminAuthService {
             throw new AppException(HttpStatus.BAD_REQUEST, "OTP has expired", null);
         if (!req.getOtp().equals(otp))
             throw new AppException(HttpStatus.FORBIDDEN, "Invalid OTP", null);
-        Admin admin = adminRepository.findByEmail(req.getEmail())
+        Admin admin = adminRepository.findByEmailAndDeletedFalse(req.getEmail())
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Admin not found", null));
         if (!admin.isEnabled())
             throw new AppException(HttpStatus.FORBIDDEN, "Admin account is disabled", null);

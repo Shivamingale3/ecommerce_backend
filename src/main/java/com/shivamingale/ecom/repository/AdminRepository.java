@@ -1,12 +1,13 @@
 package com.shivamingale.ecom.repository;
 
-import java.util.Optional;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 import com.shivamingale.ecom.entity.Admin;
+import java.util.Optional;
+import org.springframework.stereotype.Repository;
 
 @Repository
-public interface AdminRepository extends JpaRepository<Admin, String> {
-    Optional<Admin> findByEmail(String email);
+public interface AdminRepository extends BaseRepository<Admin> {
+
+    Optional<Admin> findByEmailAndDeletedFalse(String email);
+
     boolean existsByEmail(String email);
 }

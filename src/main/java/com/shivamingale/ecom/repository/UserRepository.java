@@ -2,13 +2,12 @@ package com.shivamingale.ecom.repository;
 
 import com.shivamingale.ecom.entity.User;
 import java.util.Optional;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, String> {
+public interface UserRepository extends BaseRepository<User> {
 
-    Optional<User> findByEmail(String email);
+    Optional<User> findByEmailAndDeletedFalse(String email);
 
     boolean existsByEmail(String email);
 }

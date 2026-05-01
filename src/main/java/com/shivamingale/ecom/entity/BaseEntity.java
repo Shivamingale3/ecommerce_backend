@@ -9,13 +9,11 @@ import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Version;
 import java.time.Instant;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
-@Setter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
@@ -24,18 +22,23 @@ public abstract class BaseEntity {
     @GeneratedValue
     @UlidGenerator
     @Column(updatable = false, nullable = false)
-    private String id;
+    public String id;
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     @CreatedDate
-    @Column(updatable = false)
+    @Column(name = "created_at", updatable = false)
     private Instant createdAt;
 
     @LastModifiedDate
+    @Column(name = "updated_at")
     private Instant updatedAt;
 
     @Version
     private Long version;
 
-    @Column(name = "is_deleted", nullable = false, columnDefinition = "boolean default false")
-    private Boolean isDeleted = false;
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
 }

@@ -1,12 +1,11 @@
 package com.shivamingale.ecom.repository;
 
-import java.util.Optional;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import com.shivamingale.ecom.entity.SignInRequest;
+import java.util.Optional;
+import org.springframework.stereotype.Repository;
 
-public interface SignInRequestRepository extends JpaRepository<SignInRequest, String> {
+@Repository
+public interface SignInRequestRepository extends BaseRepository<SignInRequest> {
 
-    Optional<SignInRequest> findByEmail(String email);
+    Optional<SignInRequest> findByEmailAndDeletedFalse(String email);
 }

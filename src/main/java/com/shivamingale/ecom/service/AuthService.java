@@ -64,7 +64,7 @@ public class AuthService {
     @Transactional
     public Map<String, String> requestSignInOtp(SignInRequestDto request) {
 
-        Optional<SignInRequest> existingRequest = signInRequestRepository.findByEmail(request.getEmail());
+        Optional<SignInRequest> existingRequest = signInRequestRepository.findByEmailAndDeletedFalse(request.getEmail());
 
         if (existingRequest.isPresent()) {
             if (existingRequest.get().getValidTill().isAfter(Instant.now())) {
