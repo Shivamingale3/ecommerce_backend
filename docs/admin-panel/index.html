@@ -1,0 +1,2169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Task Tracker</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%233b82f6' rx='15' width='100' height='100'/><path fill='white' d='M25 30h50v10H25zM25 45h50v10H25zM25 60h35v10H25z'/></svg>">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-card: #1e293b;
+      --bg-hover: #334155;
+      --bg-detail: #0f172a;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --in-progress: #f97316;
+      --danger: #ef4444;
+      --code-bg: #0d1117;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    .container { max-width: 1400px; margin: 0 auto; padding: 1.5rem; }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .title-group h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .title-group p { color: var(--text-muted); font-size: 0.8rem; margin-top: 0.2rem; }
+
+    .header-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+    .btn {
+      padding: 0.4rem 0.8rem;
+      border-radius: 0.4rem;
+      border: none;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 500;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-secondary { background: var(--bg-card); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--bg-hover); }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-danger:hover { opacity: 0.9; }
+
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border-radius: 0.5rem;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+    }
+
+    .stat-card .label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .stat-card .value { font-size: 1.25rem; font-weight: 700; margin-top: 0.2rem; }
+    .stat-card .value.success { color: var(--success); }
+    .stat-card .value.in-progress { color: var(--in-progress); }
+    .stat-card .value.pending { color: var(--text-muted); }
+
+    .progress-section {
+      background: var(--bg-card);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--border);
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .progress-header h3 { font-size: 0.8rem; font-weight: 600; }
+    .progress-header .percent { font-size: 1rem; font-weight: 700; color: var(--accent); }
+
+    .progress-track { height: 0.35rem; background: var(--bg); border-radius: 999px; overflow: hidden; }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--success));
+      border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+
+    .filter-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .status-pills { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+
+    .status-pill {
+      padding: 0.3rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-muted);
+      transition: all 0.15s;
+    }
+
+    .status-pill:hover { border-color: var(--accent); }
+    .status-pill.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+    .status-pill .count { opacity: 0.7; margin-left: 0.2rem; }
+
+    .search-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 0.4rem;
+      padding: 0.4rem 0.75rem;
+      color: var(--text);
+      font-size: 0.75rem;
+      width: 100%;
+      max-width: 250px;
+    }
+
+    .search-box:focus { outline: none; border-color: var(--accent); }
+    .search-box::placeholder { color: var(--text-muted); }
+
+    .phases-grid { display: flex; flex-direction: column; gap: 0.75rem; }
+
+    .phase-card {
+      background: var(--bg-card);
+      border-radius: 0.5rem;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .phase-card:hover { border-color: var(--accent); }
+
+    .phase-header {
+      padding: 0.75rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s;
+    }
+
+    .phase-header:hover { background: var(--bg-hover); }
+
+    .phase-title { display: flex; align-items: center; gap: 0.6rem; }
+
+    .phase-badge {
+      width: 1.75rem;
+      height: 1.75rem;
+      border-radius: 0.4rem;
+      background: var(--accent);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .phase-info h3 { font-size: 0.9rem; font-weight: 600; }
+    .phase-info .meta { font-size: 0.65rem; color: var(--text-muted); }
+
+    .phase-actions { display: flex; align-items: center; gap: 0.75rem; }
+
+    .phase-progress { font-size: 0.75rem; color: var(--text-muted); }
+    .phase-progress .done { color: var(--success); font-weight: 600; }
+
+    .phase-toggle {
+      width: 1.25rem;
+      height: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      transition: transform 0.2s;
+    }
+
+    .phase-card.expanded .phase-toggle { transform: rotate(180deg); }
+
+    .phase-content { display: none; border-top: 1px solid var(--border); }
+    .phase-card.expanded .phase-content { display: block; }
+
+    .task-list { padding: 0.5rem; }
+
+    .task-item {
+      border-radius: 0.4rem;
+      margin-bottom: 0.5rem;
+      border: 1px solid transparent;
+      transition: border-color 0.15s;
+    }
+
+    .task-item:last-child { margin-bottom: 0; }
+
+    .task-item:hover { border-color: var(--border); }
+
+    .task-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      padding: 0.6rem;
+    }
+
+    .task-checkbox {
+      width: 1.1rem;
+      height: 1.1rem;
+      border-radius: 0.3rem;
+      border: 2px solid var(--border);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+      transition: all 0.15s;
+    }
+
+    .task-checkbox:hover { border-color: var(--accent); }
+    .task-checkbox.checked { background: var(--success); border-color: var(--success); }
+    .task-checkbox svg { display: none; width: 0.65rem; height: 0.65rem; color: white; }
+    .task-checkbox.checked svg { display: block; }
+
+    .task-main { flex: 1; min-width: 0; }
+
+    .task-top {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .task-name { font-size: 0.85rem; font-weight: 500; }
+    .task-item.completed .task-name { text-decoration: line-through; color: var(--text-muted); }
+    .task-item.in-progress .task-name { color: var(--in-progress); }
+
+    .task-endpoint {
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 0.65rem;
+      padding: 0.1rem 0.4rem;
+      background: var(--code-bg);
+      border-radius: 0.25rem;
+      color: var(--accent);
+    }
+
+    .task-badges { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+
+    .badge {
+      font-size: 0.6rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 0.25rem;
+      font-weight: 500;
+    }
+
+    .badge-in-progress { background: rgba(249, 115, 22, 0.2); color: var(--in-progress); }
+    .badge-completed { background: rgba(34, 197, 94, 0.2); color: var(--success); }
+
+    .task-actions { display: flex; gap: 0.4rem; }
+
+    .btn-sm {
+      padding: 0.2rem 0.5rem;
+      font-size: 0.65rem;
+      border-radius: 0.25rem;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+
+    .btn-sm-inprogress { background: rgba(249, 115, 22, 0.2); color: var(--in-progress); }
+    .btn-sm-inprogress:hover { background: rgba(249, 115, 22, 0.3); }
+    .btn-sm-inprogress.active { background: var(--in-progress); color: white; }
+
+    .btn-sm-delete { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+    .btn-sm-delete:hover { background: rgba(239, 68, 68, 0.3); }
+
+    .task-details {
+      display: none;
+      padding: 0 0.6rem 0.6rem 0.6rem;
+      margin-top: 0.5rem;
+      border-top: 1px solid var(--border);
+      padding-top: 0.5rem;
+    }
+
+    .task-item.show-details .task-details { display: block; }
+
+    .detail-section {
+      margin-bottom: 0.75rem;
+    }
+
+    .detail-section:last-child { margin-bottom: 0; }
+
+    .detail-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.3rem;
+    }
+
+    .detail-value { font-size: 0.8rem; }
+
+    code {
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+      background: var(--code-bg);
+      padding: 0.1rem 0.3rem;
+      border-radius: 0.2rem;
+      font-size: 0.75rem;
+    }
+
+    pre {
+      background: var(--code-bg);
+      border-radius: 0.4rem;
+      padding: 0.75rem;
+      overflow-x: auto;
+      font-size: 0.7rem;
+      line-height: 1.5;
+      margin-top: 0.3rem;
+    }
+
+    pre code { background: none; padding: 0; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.75rem;
+      margin-top: 0.3rem;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 0.4rem 0.5rem;
+      border: 1px solid var(--border);
+    }
+
+    th { background: var(--bg); font-weight: 600; }
+    td:first-child { color: var(--accent); font-family: monospace; }
+    td:last-child { color: var(--text-muted); }
+
+    .error-table td:nth-child(2) { color: var(--danger); font-weight: 500; }
+    .error-table td:last-child { color: var(--text-muted); }
+
+    ul { padding-left: 1.25rem; font-size: 0.8rem; }
+    li { margin-bottom: 0.2rem; }
+    li:last-child { margin-bottom: 0; }
+
+    .method {
+      display: inline-block;
+      padding: 0.1rem 0.4rem;
+      border-radius: 0.25rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      font-family: monospace;
+    }
+
+    .method-post { background: rgba(34, 197, 94, 0.2); color: var(--success); }
+    .method-get { background: rgba(59, 130, 246, 0.2); color: var(--accent); }
+    .method-put { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+    .method-delete { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+
+    .task-detail-toggle {
+      width: 1.25rem;
+      height: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .task-item.show-details .task-detail-toggle { transform: rotate(180deg); }
+
+    .doc-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.7rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+      padding: 0.2rem 0.4rem;
+      border-radius: 0.25rem;
+      transition: background 0.15s;
+    }
+
+    .doc-link:hover { background: var(--bg-hover); }
+    .doc-link svg { width: 0.75rem; height: 0.75rem; }
+
+    footer {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+    }
+
+    footer a { color: var(--accent); text-decoration: none; }
+
+    @media (max-width: 640px) {
+      .container { padding: 1rem; }
+      .stats-bar { grid-template-columns: repeat(2, 1fr); }
+      .phase-header { flex-wrap: wrap; gap: 0.5rem; }
+      .task-top { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="title-group">
+        <h1>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <path d="M9 9h6M9 13h6M9 17h4"/>
+          </svg>
+          Admin Panel Task Tracker
+        </h1>
+        <p>53 tasks across 7 phases - click any task for full implementation details</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-secondary" onclick="exportData()">Export</button>
+        <button class="btn btn-secondary" onclick="importData()">Import</button>
+        <button class="btn btn-danger" onclick="resetAll()">Reset All</button>
+      </div>
+    </header>
+
+    <div class="stats-bar" id="stats"></div>
+
+    <div class="progress-section">
+      <div class="progress-header">
+        <h3>Overall Progress</h3>
+        <span class="percent" id="overallPercent">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <div class="filter-row">
+      <div class="status-pills" id="statusPills">
+        <button class="status-pill active" data-filter="all">All <span class="count" id="countAll">53</span></button>
+        <button class="status-pill" data-filter="pending">Pending <span class="count" id="countPending">53</span></button>
+        <button class="status-pill" data-filter="in-progress">In Progress <span class="count" id="countInProgress">0</span></button>
+        <button class="status-pill" data-filter="completed">Completed <span class="count" id="countCompleted">0</span></button>
+      </div>
+      <input type="text" class="search-box" id="searchBox" placeholder="Search tasks...">
+    </div>
+
+    <div class="phases-grid" id="phasesGrid"></div>
+
+    <footer>
+      <p>Auto-saves locally &bull; <a href="https://github.com/Shivamingale3/practice-ecommerce-backend/tree/master/docs/admin-panel" target="_blank">View on GitHub</a></p>
+    </footer>
+  </div>
+
+<script>
+const STORAGE_KEY = 'admin_panel_tasks_v2';
+
+const phasesData = [
+{
+  id: 0,
+  name: 'Admin Authentication & Profile',
+  doc: 'PHASE_0_Admin_Auth_Profile.md',
+  tasks: [
+    {
+      id: '0.1',
+      name: 'Admin Login (OTP Request)',
+      method: 'POST',
+      endpoint: '/api/admin/v1/auth/login',
+      request: `{
+  "email": "admin@example.com"
+}`,
+      response: `{
+  "success": true,
+  "data": {
+    "message": "OTP sent to email",
+    "expiresAt": "2026-05-01T10:05:00Z"
+  }
+}`,
+      validation: [
+        { field: 'email', type: 'String', required: true, rules: 'Valid email format' }
+      ],
+      dbActions: ['Insert: AdminOtp (email, otp, expiresAt)'],
+      errors: [
+        { code: 'NOT_FOUND', message: 'Admin not found', condition: 'Email not in admins table' },
+        { code: 'BAD_REQUEST', message: 'OTP already sent', condition: 'Within 60s cooldown' }
+      ],
+      notes: 'Sends 6-digit OTP to admin email, valid 5 minutes'
+    },
+    {
+      id: '0.2',
+      name: 'Verify OTP',
+      method: 'POST',
+      endpoint: '/api/admin/v1/auth/verify-otp',
+      request: `{
+  "email": "admin@example.com",
+  "otp": "123456"
+}`,
+      response: `{
+  "success": true,
+  "data": {
+    "accessToken": "eyJ...",
+    "refreshToken": "eyJ...",
+    "expiresIn": 900,
+    "admin": { "id": "...", "email": "...", "role": "ADMIN" }
+  }
+}`,
+      validation: [
+        { field: 'email', type: 'String', required: true, rules: 'Valid email' },
+        { field: 'otp', type: 'String', required: true, rules: '6 digits' }
+      ],
+      dbActions: ['Select: AdminOtp WHERE email AND deleted=false', 'Delete: AdminOtp after use'],
+      errors: [
+        { code: 'BAD_REQUEST', message: 'Invalid OTP', condition: 'OTP mismatch or expired' },
+        { code: 'NOT_FOUND', message: 'OTP expired', condition: 'OTP not found or already used' }
+      ],
+      notes: 'Existing in AdminAuthService. Returns JWT tokens on success.'
+    },
+    {
+      id: '0.3',
+      name: 'Resend OTP',
+      method: 'POST',
+      endpoint: '/api/admin/v1/auth/resend-otp',
+      request: `{
+  "email": "admin@example.com"
+}`,
+      response: `{
+  "success": true,
+  "data": {
+    "message": "OTP resent",
+    "expiresAt": "2026-05-01T10:05:00Z"
+  }
+}`,
+      validation: [
+        { field: 'email', type: 'String', required: true, rules: 'Valid email' }
+      ],
+      dbActions: ['Update: AdminOtp (delete old, insert new)'],
+      errors: [
+        { code: 'NOT_FOUND', message: 'Admin not found', condition: 'Email not in admins' }
+      ],
+      notes: 'Existing in AdminAuthService. 60s cooldown between requests.'
+    },
+    {
+      id: '0.4',
+      name: 'Refresh Token',
+      method: 'POST',
+      endpoint: '/api/admin/v1/auth/refresh',
+      request: `{
+  "refreshToken": "eyJ..."
+}`,
+      response: `{
+  "success": true,
+  "data": {
+    "accessToken": "eyJ...",
+    "expiresIn": 900
+  }
+}`,
+      validation: [
+        { field: 'refreshToken', type: 'String', required: true, rules: 'Valid JWT' }
+      ],
+      dbActions: ['Validate: RefreshToken in database'],
+      errors: [
+        { code: 'UNAUTHORIZED', message: 'Invalid refresh token', condition: 'Token expired or revoked' }
+      ],
+      notes: 'Only access token refreshed, not refresh token itself'
+    },
+    {
+      id: '0.5',
+      name: 'Get Admin Profile',
+      method: 'GET',
+      endpoint: '/api/admin/v1/profile',
+      request: 'No body - JWT in Authorization header',
+      response: `{
+  "success": true,
+  "data": {
+    "id": "01ARZ...",
+    "email": "admin@example.com",
+    "name": "John Admin",
+    "role": "ADMIN",
+    "createdAt": "2026-01-15T10:00:00Z"
+  }
+}`,
+      validation: [],
+      dbActions: ['Select: Admin WHERE id = JWT.subject AND deleted=false'],
+      errors: [],
+      notes: 'Extracts admin ID from JWT token'
+    },
+    {
+      id: '0.6',
+      name: 'Update Admin Profile',
+      method: 'PUT',
+      endpoint: '/api/admin/v1/profile',
+      request: `{
+  "name": "John Smith",
+  "currentPassword": "old123",
+  "newPassword": "new456"
+}`,
+      response: `{
+  "success": true,
+  "message": "Profile updated",
+  "data": {
+    "id": "01ARZ...",
+    "email": "admin@example.com",
+    "name": "John Smith"
+  }
+}`,
+      validation: [
+        { field: 'name', type: 'String', required: false, rules: 'Max 100 chars' },
+        { field: 'currentPassword', type: 'String', required: false, rules: 'Required if changing password' },
+        { field: 'newPassword', type: 'String', required: false, rules: 'Min 8 chars if provided' }
+      ],
+      dbActions: ['Update: Admin (name, passwordHash)'],
+      errors: [
+        { code: 'BAD_REQUEST', message: 'Current password incorrect', condition: 'Password mismatch' },
+        { code: 'BAD_REQUEST', message: 'New password too weak', condition: 'Validation failed' }
+      ],
+      notes: 'Password change requires current password verification'
+    },
+    {
+      id: '0.7',
+      name: 'Logout',
+      method: 'POST',
+      endpoint: '/api/admin/v1/auth/logout',
+      request: `{ "refreshToken": "eyJ..." }`,
+      response: `{
+  "success": true,
+  "message": "Logged out successfully"
+}`,
+      validation: [],
+      dbActions: ['Delete: RefreshToken from database'],
+      errors: [],
+      notes: 'Invalidates refresh token server-side'
+    }
+  ]
+},
+{
+  id: 1,
+  name: 'Media Library',
+  doc: 'PHASE_1_Media_Library.md',
+  tasks: [
+    {
+      id: '1.1',
+      name: 'Request Upload URL',
+      method: 'POST',
+      endpoint: '/api/admin/v1/media/upload-url',
+      request: `{
+  "filename": "hero-image.jpg",
+  "mimeType": "image/jpeg",
+  "fileSize": 2048000
+}`,
+      response: `{
+  "success": true,
+  "data": {
+    "mediaId": "temp_01ARZ...",
+    "uploadUrl": "https://minio.../media/... ?signature=...",
+    "key": "media/2026/05/01/01ARZ/hero-image.jpg",
+    "expiresAt": "2026-05-01T10:05:00Z",
+    "method": "PUT"
+  }
+}`,
+      validation: [
+        { field: 'filename', type: 'String', required: true, rules: 'Max 255 chars, valid extension' },
+        { field: 'mimeType', type: 'String', required: true, rules: 'Allowed: image/jpeg, png, webp, gif, video/mp4, webm, audio/mpeg, ogg, pdf' },
+        { field: 'fileSize', type: 'Long', required: true, rules: 'Max 5MB (5242880 bytes)' }
+      ],
+      dbActions: ['None (temp record only)'],
+      cacheActions: ['Set: pending_upload:{mediaId} TTL 5min'],
+      errors: [
+        { code: 'BAD_REQUEST', message: 'File size exceeds 5MB', condition: 'fileSize > 5242880' },
+        { code: 'BAD_REQUEST', message: 'File type not allowed', condition: 'mimeType not in allowed list' }
+      ],
+      notes: 'Generate presigned PUT URL from ObjectStorageService. Client uploads directly to S3.'
+    },
+    {
+      id: '1.2',
+      name: 'Confirm Upload',
+      method: 'POST',
+      endpoint: '/api/admin/v1/media/confirm-upload',
+      request: `{
+  "mediaId": "temp_01ARZ...",
+  "name": "Hero Image",
+  "altText": "Main banner image"
+}`,
+      response: `{
+  "success": true,
+  "message": "Media created",
+  "data": {
+    "id": "01ARZ...",
+    "name": "Hero Image",
+    "url": "https://cdn.example.com/...",
+    "type": "IMAGE",
+    "mimeType": "image/jpeg",
+    "fileSize": 2048000
+  }
+}`,
+      validation: [
+        { field: 'mediaId', type: 'String', required: true, rules: 'Valid temp ID from step 1' },
+        { field: 'name', type: 'String', required: false, rules: 'Max 255 chars' },
+        { field: 'altText', type: 'String', required: false, rules: 'Max 500 chars' }
+      ],
+      dbActions: ['Insert: Media (name, type, key, url, altText, mimeType, fileSize, width, height)'],
+      cacheActions: ['Delete: pending_upload:{mediaId}', 'Set: media:url:{id} TTL 55min'],
+      errors: [
+        { code: 'NOT_FOUND', message: 'Pending upload not found', condition: 'mediaId expired or invalid' },
+        { code: 'BAD_REQUEST', message: 'Upload not completed', condition: 'S3 object does not exist' }
+      ],
+      notes: 'Verify S3 object exists, create Media record, return permanent ID'
+    },
+    {
+      id: '1.3',
+      name: 'List Media',
+      method: 'GET',
+      endpoint: '/api/admin/v1/media',
+      request: 'Query params: limit, offset, type, search',
+      response: `{
+  "success": true,
+  "data": {
+    "items": [{ "id": "...", "name": "...", "type": "IMAGE", "url": "..." }],
+    "total": 150,
+    "limit": 20,
+    "offset": 0
+  }
+}`,
+      validation: [
+        { field: 'limit', type: 'Integer', required: false, rules: 'Default 20, min 1, max 100' },
+        { field: 'offset', type: 'Integer', required: false, rules: 'Default 0, min 0' },
+        { field: 'type', type: 'String', required: false, rules: 'IMAGE, VIDEO, AUDIO, DOCUMENT' },
+        { field: 'search', type: 'String', required: false, rules: 'Search in name, LIKE %search%' }
+      ],
+      dbActions: ['Select: Media WHERE deleted=false', 'Count: Total matching'],
+      errors: [],
+      notes: 'Paginated list with optional type filter and search'
+    },
+    {
+      id: '1.4',
+      name: 'Get Single Media',
+      method: 'GET',
+      endpoint: '/api/admin/v1/media/{id}',
+      request: 'Path param: media ID',
+      response: `{
+  "success": true,
+  "data": {
+    "id": "01ARZ...",
+    "name": "Hero Image",
+    "type": "IMAGE",
+    "url": "https://cdn.example.com/...",
+    "presignedUrl": "https://...",
+    "presignedUrlExpiresAt": "...",
+    "altText": "Main banner",
+    "mimeType": "image/jpeg",
+    "fileSize": 2048000,
+    "width": 1920,
+    "height": 1080
+  }
+}`,
+      validation: [],
+      dbActions: ['Select: Media WHERE id AND deleted=false'],
+      errors: [
+        { code: 'NOT_FOUND', message: 'Media not found', condition: 'ID not found' }
+      ],
+      notes: 'Returns media with presigned URL for display'
+    },
+    {
+      id: '1.5',
+      name: 'Update Media',
+      method: 'PUT',
+      endpoint: '/api/admin/v1/media/{id}',
+      request: `{
+  "name": "Updated Name",
+  "altText": "Updated alt text",
+  "active": true
+}`,
+      response: `{
+  "success": true,
+  "message": "Media updated",
+  "data": { "id": "...", "name": "...", "altText": "..." }
+}`,
+      validation: [
+        { field: 'name', type: 'String', required: false, rules: 'Max 255 chars' },
+        { field: 'altText', type: 'String', required: false, rules: 'Max 500 chars' },
+        { field: 'active', type: 'Boolean', required: false, rules: 'Default true' }
+      ],
+      dbActions: ['Update: Media SET name, altText, active WHERE id'],
+      errors: [
+        { code: 'NOT_FOUND', message: 'Media not found', condition: 'ID not found' }
+      ],
+      notes: 'Only updates provided fields'
+    },
+    {
+      id: '1.6',
+      name: 'Delete Media',
+      method: 'DELETE',
+      endpoint: '/api/admin/v1/media/{id}',
+      request: 'Path param: media ID',
+      response: `{
+  "success": true,
+  "message": "Media deleted"
+}`,
+      validation: [],
+      dbActions: ['Update: Media SET deleted=true WHERE id'],
+      cacheActions: ['Delete: media:url:{id}'],
+      errors: [
+        { code: 'NOT_FOUND', message: 'Media not found', condition: 'ID not found' }
+      ],
+      notes: 'Soft delete. S3 object remains for backward compatibility.'
+    },
+    {
+      id: '1.7',
+      name: 'Get/Refresh Presigned URL',
+      method: 'GET',
+      endpoint: '/api/admin/v1/media/{id}/url',
+      request: 'Path param: media ID',
+      response: `{
+  "success": true,
+  "data": {
+    "url": "https://...",
+    "expiresAt": "2026-05-01T11:00:00Z"
+  }
+}`,
+      validation: [],
+      dbActions: ['Select: Media WHERE id'],
+      cacheActions: ['Check: media:url:{id}', 'Set if miss: TTL 55min'],
+      errors: [
+        { code: 'NOT_FOUND', message: 'Media not found', condition: 'ID not found' }
+      ],
+      notes: 'Returns cached presigned URL or generates new one'
+    },
+    {
+      id: '1.8',
+      name: 'Pending Upload Cleanup',
+      method: 'SCHEDULED',
+      endpoint: 'Scheduled Task (Cron)',
+      request: 'No request - automatic job',
+      response: 'No response - internal cleanup',
+      validation: [],
+      dbActions: ['Check S3 for orphan objects'],
+      cacheActions: ['Keys with TTL auto-expire (5min)'],
+      errors: [],
+      notes: 'Redis TTL handles cleanup automatically. S3 lifecycle policy for orphan objects.'
+    },
+    {
+      id: '1.9',
+      name: 'Get Unassigned Media',
+      method: 'GET',
+      endpoint: '/api/admin/v1/media/unassigned',
+      request: 'Query params: limit, offset, type',
+      response: `{
+  "success": true,
+  "data": {
+    "items": [{ "id": "...", "name": "...", "type": "IMAGE", "url": "..." }],
+    "total": 25,
+    "limit": 20,
+    "offset": 0
+  }
+}`,
+      validation: [
+        { field: 'limit', type: 'Integer', required: false, rules: 'Default 20' },
+        { field: 'type', type: 'String', required: false, rules: 'Filter by MediaType' }
+      ],
+      dbActions: ['Select: Media WHERE deleted=false AND NOT EXISTS (ProductMedia WHERE media_id)'],
+      errors: [],
+      notes: 'Finds media not linked to any product'
+    }
+  ]
+},
+{
+  id: 2,
+  name: 'Category Management',
+  doc: 'PHASE_2_Category_Management.md',
+  tasks: [
+    {
+      id: '2.1',
+      name: 'Create Category',
+      method: 'POST',
+      endpoint: '/api/admin/v1/categories',
+      request: `{
+  "name": "Running Shoes",
+  "parentCategoryId": null,
+  "description": "High-performance running footwear",
+  "imageMediaId": "01ARZ...",
+  "displayOrder": 0
+}`,
+      response: `{
+  "success": true,
+  "message": "Category created",
+  "data": {
+    "id": "01ARZ...",
+    "name": "Running Shoes",
+    "slug": "running-shoes",
+    "path": "running-shoes",
+    "depth": 0
+  }
+}`,
+      validation: [
+        { field: 'name', type: 'String', required: true, rules: 'Max 100 chars, not blank' },
+        { field: 'parentCategoryId', type: 'String', required: false, rules: 'Must exist if provided' },
+        { field: 'description', type: 'String', required: false, rules: 'Max 500 chars' },
+        { field: 'imageMediaId', type: 'String', required: false, rules: 'Must exist, type=IMAGE' },
+        { field: 'displayOrder', type: 'Integer', required: false, rules: 'Default 0, >= 0' }
+      ],
+      dbActions: ['Insert: Category', 'Check: parent exists, image exists'],
+      cacheActions: ['Delete: categories:tree'],
+      errors: [
+        { code: 'BAD_REQUEST', message: 'Name required', condition: 'name blank' },
+        { code: 'NOT_FOUND', message: 'Parent not found', condition: 'parentCategoryId invalid' },
+        { code: 'BAD_REQUEST', message: 'Slug exists', condition: 'slug not unique' }
+      ],
+      notes: 'Auto-generates slug. Computes path/depth from parent.'
+    },
+    {
+      id: '2.2',
+      name: 'List Categories',
+      method: 'GET',
+      endpoint: '/api/admin/v1/categories',
+      request: 'Query params: limit, offset, parentId, active, search',
+      response: `{
+  "success": true,
+  "data": {
+    "items": [{ "id": "...", "name": "...", "slug": "...", "children": [...] }],
+    "total": 25,
+    "limit": 50,
+    "offset": 0
+  }
+}`,
+      validation: [
+        { field: 'limit', type: 'Integer', required: false, rules: 'Default 50' },
+        { field: 'parentId', type: 'String', required: false, rules: 'Filter by parent' },
+        { field: 'active', type: 'Boolean', required: false, rules: 'Filter by active status' }
+      ],
+      dbActions: ['Select: Category WHERE deleted=false', 'Count: Total'],
+      cacheActions: ['Check: categories:tree', 'Set: TTL 30min'],
+      errors: [],
+      notes: 'Returns hierarchical tree structure'
+    },
+    {
+      id: '2.3',
+      name: 'Get Single Category',
+      method: 'GET',
+      endpoint: '/api/admin/v1/categories/{id}',
+      request: 'Path param: category ID',
+      response: `{
+  "success": true,
+  "data": {
+    "id": "01ARZ...",
+    "name": "Running Shoes",
+    "slug": "running-shoes",
+    "description": "...",
+    "displayOrder": 0,
+    "active": true,
+    "path": "running-shoes",
+    "depth": 0,
+    "parent": null,
+    "children": [],
+    "image": { "id": "...", "url": "..." }
+  }
+}`,
+      validation: [],
+      dbActions: ['Select: Category WHERE id AND deleted=false', 'Select: children'],
+      errors: [
+        { code: 'NOT_FOUND', message: 'Category not found', condition: 'ID not found' }
+      ],
+      notes: 'Returns full category with children and image'
+    },
+    {
+      id: '2.4',
+      name: 'Update Category',
+      method: 'PUT',
+      endpoint: '/api/admin/v1/categories/{id}',
+      request: `{
+  "name": "Updated Name",
+  "description": "Updated description",
+  "active": true,
+  "displayOrder": 2
+}`,
+      response: `{
+  "success": true,
+  "message": "Category updated",
+  "data": { "id": "...", "name": "..." }
+}`,
+      validation: [
+        { field: 'name', type: 'String', required: false, rules: 'Max 100 chars' },
+        { field: 'description', type: 'String', required: false, rules: 'Max 500 chars' },
+        { field: 'active', type: 'Boolean', required: false, rules: 'Default true' }
+      ],
+      dbActions: ['Update: Category', 'Update children path if slug changes'],
+      cacheActions: ['Delete: categories:tree'],
+      errors: [
+        { code: 'NOT_FOUND', message: 'Category not found', condition: 'ID not found' }
+      ],
+      notes: 'If name changes, regenerate slug and update all children paths'
+    },
+    {
+      id: '2.5',
+      name: 'Reorder Categories',
+      method: 'PUT',
+      endpoint: '/api/admin/v1/categories/reorder',
+      request: `{
+  "items": [
+    { "categoryId": "01ARZ...", "displayOrder": 0 },
+    { "categoryId": "01ARZ...", "displayOrder": 1 }
+  ]
+}`,
+      response: `{
+  "success": true,
+  "message": "Categories reordered",
+  "data": { "updatedCount": 2 }
+}`,
+      validation: [
+        { field: 'items', type: 'Array', required: true, rules: 'Min 1, max 100' },
+        { field: 'items[].categoryId', type: 'String', required: true, rules: 'Must exist' },
+        { field: 'items[].displayOrder', type: 'Integer', required: true, rules: '>= 0' }
+      ],
+      dbActions: ['Batch Update: Category SET displayOrder'],
+      cacheActions: ['Delete: categories:tree'],
+      errors: [
+        { code: 'BAD_REQUEST', message: 'Invalid items', condition: 'Validation failed' }
+      ],
+      notes: 'Batch update displayOrder for multiple categories'
+    },
+    {
+      id: '2.6',
+      name: 'Delete Category',
+      method: 'DELETE',
+      endpoint: '/api/admin/v1/categories/{id}',
+      request: 'Path param: category ID',
+      response: `{
+  "success": true,
+  "message": "Category deleted"
+}`,
+      validation: [],
+      dbActions: ['Update: Category SET deleted=true', 'Update: ProductCategory SET deleted=true'],
+      cacheActions: ['Delete: categories:tree'],
+      errors: [
+        { code: 'NOT_FOUND', message: 'Category not found', condition: 'ID not found' },
+        { code: 'BAD_REQUEST', message: 'Has children', condition: 'Children exist' }
+      ],
+      notes: 'Soft delete. Optionally move children to parent or reject if children exist.'
+    },
+    {
+      id: '2.7',
+      name: 'Set Category Image',
+      method: 'PUT',
+      endpoint: '/api/admin/v1/categories/{id}/image',
+      request: `{
+  "mediaId": "01ARZ..."
+}`,
+      response: `{
+  "success": true,
+  "message": "Image updated",
+  "data": { "id": "...", "image": { "id": "...", "url": "..." } }
+}`,
+      validation: [
+        { field: 'mediaId', type: 'String', required: true, rules: 'Must exist, type=IMAGE' }
+      ],
+      dbActions: ['Update: Category SET image_id', 'Verify Media exists'],
+      errors: [
+        { code: 'NOT_FOUND', message: 'Category or media not found', condition: 'ID invalid' },
+        { code: 'BAD_REQUEST', message: 'Not an image', condition: 'media.type != IMAGE' }
+      ],
+      notes: 'Links Media to Category.image'
+    }
+  ]
+},
+{
+  id: 3,
+  name: 'Brand Management',
+  doc: 'PHASE_3_Brand_Management.md',
+  tasks: [
+    {
+      id: '3.1',
+      name: 'Create Brand',
+      method: 'POST',
+      endpoint: '/api/admin/v1/brands',
+      request: `{
+  "name": "Nike",
+  "description": "<p>Nike is a world-famous sports brand...</p>",
+  "logoMediaId": "01ARZ..."
+}`,
+      response: `{
+  "success": true,
+  "message": "Brand created",
+  "data": {
+    "id": "01ARZ...",
+    "name": "Nike",
+    "slug": "nike",
+    "description": "Nike is a world-famous sports brand..."
+  }
+}`,
+      validation: [
+        { field: 'name', type: 'String', required: true, rules: 'Max 100 chars, not blank' },
+        { field: 'description', type: 'String', required: false, rules: 'Max 2000 chars, HTML allowed' },
+        { field: 'logoMediaId', type: 'String', required: false, rules: 'Must exist, type=IMAGE' }
+      ],
+      dbActions: ['Insert: Brand', 'Verify logo Media exists if provided'],
+      errors: [
+        { code: 'BAD_REQUEST', message: 'Name required', condition: 'name blank' },
+        { code: 'BAD_REQUEST', message: 'Slug exists', condition: 'slug not unique' }
+      ],
+      notes: 'Auto-generates slug. Sanitizes HTML in description (allow safe tags).'
+    },
+    {
+      id: '3.2',
+      name: 'List Brands',
+      method: 'GET',
+      endpoint: '/api/admin/v1/brands',
+      request: 'Query params: limit, offset, search',
+      response: `{
+  "success": true,
+  "data": {
+    "items": [{ "id": "...", "name": "Nike", "slug": "nike", "logo": null }],
+    "total": 15,
+    "limit": 50,
+    "offset": 0
+  }
+}`,
+      validation: [
+        { field: 'limit', type: 'Integer', required: false, rules: 'Default 50' },
+        { field: 'search', type: 'String', required: false, rules: 'LIKE %search% on name' }
+      ],
+      dbActions: ['Select: Brand WHERE deleted=false', 'Count: Total'],
+      errors: [],
+      notes: 'Simple paginated list with optional search'
+    },
+    {
+      id: '3.3',
+      name: 'Get Single Brand',
+      method: 'GET',
+      endpoint: '/api/admin/v1/brands/{id}',
+      request: 'Path param: brand ID',
+      response: `{
+  "success": true,
+  "data": {
+    "id": "01ARZ...",
+    "name": "Nike",
+    "slug": "nike",
+    "description": "...",
+    "logo": { "id": "...", "url": "..." },
+    "productCount": 42
+  }
+}`,
+      validation: [],
+      dbActions: ['Select: Brand WHERE id AND deleted=false', 'Count: Products with brand'],
+      errors: [
+        { code: 'NOT_FOUND', message: 'Brand not found', condition: 'ID not found' }
+      ],
+      notes: 'Returns brand with logo and product count'
+    },
+    {
+      id: '3.4',
+      name: 'Update Brand',
+      method: 'PUT',
+      endpoint: '/api/admin/v1/brands/{id}',
+      request: `{
+  "name": "Updated Nike",
+  "description": "Updated description",
+  "logoMediaId": "01ARZ..."
+}`,
+      response: `{
+  "success": true,
+  "message": "Brand updated",
+  "data": { "id": "...", "name": "..." }
+}`,
+      validation: [
+        { field: 'name', type: 'String', required: false, rules: 'Max 100 chars' },
+        { field: 'description', type: 'String', required: false, rules: 'Max 2000 chars, HTML sanitized' }
+      ],
+      dbActions: ['Update: Brand', 'Sanitize HTML if description changed'],
+      errors: [
+        { code: 'NOT_FOUND', message: 'Brand not found', condition: 'ID not found' }
+      ],
+      notes: 'Regenerate slug if name changes'
+    },
+    {
+      id: '3.5',
+      name: 'Delete Brand',
+      method: 'DELETE',
+      endpoint: '/api/admin/v1/brands/{id}',
+      request: 'Path param: brand ID',
+      response: `{
+  "success": true,
+  "message": "Brand deleted"
+}`,
+      validation: [],
+      dbActions: ['Update: Brand SET deleted=true'],
+      errors: [
+        { code: 'NOT_FOUND', message: 'Brand not found', condition: 'ID not found' },
+        { code: 'BAD_REQUEST', message: 'Has products', condition: 'Products reference this brand' }
+      ],
+      notes: 'Soft delete. Reject if products exist (or set product.brandId = null).'
+    }
+  ]
+},
+{
+  id: 4,
+  name: 'Tag Management',
+  doc: 'PHASE_4_Tag_Management.md',
+  tasks: [
+    {
+      id: '4.1',
+      name: 'Create Tag',
+      method: 'POST',
+      endpoint: '/api/admin/v1/tags',
+      request: `{ "name": "Best Seller" }`,
+      response: `{
+  "success": true,
+  "message": "Tag created",
+  "data": { "id": "01ARZ...", "name": "Best Seller", "slug": "best-seller" }
+}`,
+      validation: [
+        { field: 'name', type: 'String', required: true, rules: 'Max 50 chars, not blank' }
+      ],
+      dbActions: ['Insert: Tag'],
+      errors: [
+        { code: 'BAD_REQUEST', message: 'Name required', condition: 'name blank' },
+        { code: 'BAD_REQUEST', message: 'Tag exists', condition: 'slug exists' }
+      ],
+      notes: 'Auto-generates slug from name'
+    },
+    {
+      id: '4.2',
+      name: 'Create Tag Inline',
+      method: 'POST',
+      endpoint: '/api/admin/v1/tags/inline',
+      request: `{ "name": "Flash Sale" }`,
+      response: `{
+  "success": true,
+  "message": "Tag created",
+  "data": { "id": "01ARZ...", "name": "Flash Sale", "slug": "flash-sale", "created": true }
+}`,
+      validation: [
+        { field: 'name', type: 'String', required: true, rules: 'Max 50 chars' }
+      ],
+      dbActions: ['Check: Tag WHERE slug', 'Insert: Tag (if not exists)'],
+      errors: [],
+      notes: 'Idempotent - returns existing tag if slug exists. Used during product edit.'
+    },
+    {
+      id: '4.3',
+      name: 'List Tags',
+      method: 'GET',
+      endpoint: '/api/admin/v1/tags',
+      request: 'Query params: limit, offset, search',
+      response: `{
+  "success": true,
+  "data": {
+    "items": [{ "id": "...", "name": "Best Seller", "slug": "best-seller" }],
+    "total": 30,
+    "limit": 50,
+    "offset": 0
+  }
+}`,
+      validation: [
+        { field: 'limit', type: 'Integer', required: false, rules: 'Default 50' },
+        { field: 'search', type: 'String', required: false, rules: 'LIKE %search%' }
+      ],
+      dbActions: ['Select: Tag WHERE deleted=false', 'Count: Total'],
+      errors: [],
+      notes: 'Simple paginated list'
+    },
+    {
+      id: '4.4',
+      name: 'Update Tag',
+      method: 'PUT',
+      endpoint: '/api/admin/v1/tags/{id}',
+      request: `{ "name": "Top Rated" }`,
+      response: `{
+  "success": true,
+  "message": "Tag updated",
+  "data": { "id": "...", "name": "Top Rated", "slug": "top-rated" }
+}`,
+      validation: [
+        { field: 'name', type: 'String', required: true, rules: 'Max 50 chars' }
+      ],
+      dbActions: ['Update: Tag', 'Regenerate slug if name changed'],
+      errors: [
+        { code: 'NOT_FOUND', message: 'Tag not found', condition: 'ID not found' },
+        { code: 'BAD_REQUEST', message: 'Tag exists', condition: 'new slug exists' }
+      ],
+      notes: 'Updates name and regenerates slug'
+    },
+    {
+      id: '4.5',
+      name: 'Delete Tag',
+      method: 'DELETE',
+      endpoint: '/api/admin/v1/tags/{id}',
+      request: 'Path param: tag ID',
+      response: `{
+  "success": true,
+  "message": "Tag deleted",
+  "data": { "unlinkedProducts": 8 }
+}`,
+      validation: [],
+      dbActions: ['Update: Tag SET deleted=true', 'Update: ProductTag SET deleted=true'],
+      errors: [
+        { code: 'NOT_FOUND', message: 'Tag not found', condition: 'ID not found' }
+      ],
+      notes: 'Soft deletes tag and all ProductTag junctions'
+    }
+  ]
+},
+{
+  id: 5,
+  name: 'Product Management',
+  doc: 'PHASE_5_Product_Mgmt.md',
+  tasks: [
+    {
+      id: '5.1',
+      name: 'Create Product',
+      method: 'POST',
+      endpoint: '/api/admin/v1/products',
+      request: `{
+  "name": "Nike Air Max 90",
+  "description": "Classic running shoes",
+  "brandId": "01ARZ...",
+  "status": "DRAFT"
+}`,
+      response: `{
+  "success": true,
+  "message": "Product created",
+  "data": {
+    "id": "01ARZ...",
+    "name": "Nike Air Max 90",
+    "status": "DRAFT",
+    "inventory": { "stockQuantity": 0 }
+  }
+}`,
+      validation: [
+        { field: 'name', type: 'String', required: true, rules: 'Max 200 chars' },
+        { field: 'description', type: 'String', required: false, rules: 'Max 5000 chars' },
+        { field: 'brandId', type: 'String', required: false, rules: 'Must exist' },
+        { field: 'status', type: 'String', required: false, rules: 'Default DRAFT, enum: DRAFT, PENDING_REVIEW, ACTIVE, INACTIVE, ARCHIVED' }
+      ],
+      dbActions: ['Insert: Product', 'Insert: Inventory (stockQuantity=0)'],
+      errors: [
+        { code: 'BAD_REQUEST', message: 'Name required', condition: 'name blank' },
+        { code: 'NOT_FOUND', message: 'Brand not found', condition: 'brandId invalid' }
+      ],
+      notes: 'Auto-creates Inventory with 0 stock. Generates slug from name.'
+    },
+    {
+      id: '5.2',
+      name: 'List Products',
+      method: 'GET',
+      endpoint: '/api/admin/v1/products',
+      request: 'Query params: limit, offset, search, status, brandId, categoryId, minPrice, maxPrice',
+      response: `{
+  "success": true,
+  "data": {
+    "items": [{ "id": "...", "name": "...", "status": "ACTIVE", "price": 129.99 }],
+    "total": 150,
+    "limit": 20,
+    "offset": 0
+  }
+}`,
+      validation: [
+        { field: 'limit', type: 'Integer', required: false, rules: 'Default 20' },
+        { field: 'status', type: 'String', required: false, rules: 'Filter by status' }
+      ],
+      dbActions: ['Select: Product WHERE deleted=false', 'Join: Brand, Inventory', 'Count: Total'],
+      cacheActions: ['Check: products:list:{params}'],
+      errors: [],
+      notes: 'Rich filtering and search with pagination'
+    },
+    {
+      id: '5.3',
+      name: 'Get Product Detail',
+      method: 'GET',
+      endpoint: '/api/admin/v1/products/{id}',
+      request: 'Path param: product ID',
+      response: `{
+  "success": true,
+  "data": {
+    "id": "01ARZ...",
+    "name": "Nike Air Max 90",
+    "description": "...",
+    "brand": { "id": "...", "name": "Nike" },
+    "categories": [...],
+    "tags": [...],
+    "media": [...],
+    "inventory": { "stockQuantity": 100, "reservedQuantity": 5 },
+    "price": { "amount": 129.99, "currency": "USD" },
+    "dimensions": { "weight": 0.5, "length": 30, "width": 20, "height": 10 },
+    "seo": { "metaTitle": "...", "metaDescription": "..." },
+    "featured": false,
+    "visible": true,
+    "status": "ACTIVE"
+  }
+}`,
+      validation: [],
+      dbActions: ['Select: Product WHERE id AND deleted=false', 'Select: relations (Brand, Category, Tag, Media, Inventory)'],
+      cacheActions: ['Check: product:{id}'],
+      errors: [
+        { code: 'NOT_FOUND', message: 'Product not found', condition: 'ID not found' }
+      ],
+      notes: 'Returns full product with all relations'
+    },
+    {
+      id: '5.4',
+      name: 'Update Product Basic',
+      method: 'PUT',
+      endpoint: '/api/admin/v1/products/{id}',
+      request: `{
+  "name": "Nike Air Max 90 SE",
+  "description": "Updated description",
+  "brandId": "01ARZ..."
+}`,
+      response: `{
+  "success": true,
+  "message": "Product updated",
+  "data": { "id": "...", "name": "..." }
+}`,
+      validation: [
+        { field: 'name', type: 'String', required: false, rules: 'Max 200 chars' },
+        { field: 'description', type: 'String', required: false, rules: 'Max 5000 chars' },
+        { field: 'brandId', type: 'String', required: false, rules: 'Must exist' }
+      ],
+      dbActions: ['Update: Product'],
+      cacheActions: ['Delete: product:{id}'],
+      errors: [
+        { code: 'NOT_FOUND', message: 'Product not found', condition: 'ID not found' }
+      ],
+      notes: 'Only updates basic fields. Use sub-endpoints for relations/pricing/etc.'
+    },
+    {
+      id: '5.5',
+      name: 'Assign Categories/Tags',
+      method: 'PUT',
+      endpoint: '/api/admin/v1/products/{id}/relations',
+      request: `{
+  "categories": [
+    { "categoryId": "01ARZ...", "primary": true, "displayOrder": 0 }
+  ],
+  "tags": ["01ARZ...", "01ARZ..."]
+}`,
+      response: `{
+  "success": true,
+  "message": "Relations updated",
+  "data": {
+    "categories": [...],
+    "tags": [...]
+  }
+}`,
+      validation: [
+        { field: 'categories', type: 'Array', required: false, rules: 'Max 20' },
+        { field: 'tags', type: 'Array', required: false, rules: 'Max 50' }
+      ],
+      dbActions: ['Upsert: ProductCategory', 'Upsert: ProductTag'],
+      cacheActions: ['Delete: product:{id}'],
+      errors: [
+        { code: 'NOT_FOUND', message: 'Product not found', condition: 'ID invalid' },
+        { code: 'NOT_FOUND', message: 'Category not found', condition: 'categoryId invalid' }
+      ],
+      notes: 'Replaces all existing relations. Only one category can be primary.'
+    },
+    {
+      id: '5.6',
+      name: 'Assign Media',
+      method: 'PUT',
+      endpoint: '/api/admin/v1/products/{id}/media',
+      request: `{
+  "media": [
+    { "mediaId": "01ARZ...", "role": "COVER", "displayOrder": 0 },
+    { "mediaId": "01ARZ...", "role": "GALLERY", "displayOrder": 1 }
+  ]
+}`,
+      response: `{
+  "success": true,
+  "message": "Media assigned",
+  "data": { "media": [...] }
+}`,
+      validation: [
+        { field: 'media', type: 'Array', required: true, rules: 'At least 1' },
+        { field: 'media[].mediaId', type: 'String', required: true, rules: 'Must exist' },
+        { field: 'media[].role', type: 'String', required: true, rules: 'MAIN, COVER, GRID, THUMBNAIL, GALLERY, REVIEW' }
+      ],
+      dbActions: ['Upsert: ProductMedia'],
+      cacheActions: ['Delete: product:{id}'],
+      errors: [],
+      notes: 'Replaces all media assignments'
+    },
+    {
+      id: '5.7',
+      name: 'Set Pricing',
+      method: 'PUT',
+      endpoint: '/api/admin/v1/products/{id}/pricing',
+      request: `{
+  "priceAmount": 129.99,
+  "compareAtPrice": 159.99,
+  "costPrice": 65.00,
+  "currency": "USD"
+}`,
+      response: `{
+  "success": true,
+  "message": "Pricing updated",
+  "data": { "price": 129.99, "compareAtPrice": 159.99, "currency": "USD" }
+}`,
+      validation: [
+        { field: 'priceAmount', type: 'BigDecimal', required: true, rules: '>= 0' },
+        { field: 'compareAtPrice', type: 'BigDecimal', required: false, rules: '>= priceAmount' },
+        { field: 'costPrice', type: 'BigDecimal', required: false, rules: '>= 0' },
+        { field: 'currency', type: 'String', required: false, rules: 'Default USD' }
+      ],
+      dbActions: ['Update: Product SET price, compareAtPrice, costPrice, currency'],
+      cacheActions: ['Delete: product:{id}'],
+      errors: [
+        { code: 'BAD_REQUEST', message: 'Invalid price', condition: 'compareAtPrice < priceAmount' }
+      ],
+      notes: 'All monetary values as BigDecimal for precision'
+    },
+    {
+      id: '5.8',
+      name: 'Update Inventory',
+      method: 'PUT',
+      endpoint: '/api/admin/v1/products/{id}/inventory',
+      request: `{
+  "stockQuantity": 100,
+  "lowStockThreshold": 10
+}`,
+      response: `{
+  "success": true,
+  "message": "Inventory updated",
+  "data": { "stockQuantity": 100, "lowStockThreshold": 10 }
+}`,
+      validation: [
+        { field: 'stockQuantity', type: 'Integer', required: true, rules: '>= 0' },
+        { field: 'lowStockThreshold', type: 'Integer', required: false, rules: '>= 0' }
+      ],
+      dbActions: ['Update: Inventory SET stockQuantity, lowStockThreshold'],
+      cacheActions: ['Delete: product:{id}'],
+      errors: [
+        { code: 'NOT_FOUND', message: 'Inventory not found', condition: 'Product has no inventory' }
+      ],
+      notes: 'Updates Inventory directly (not incremental)'
+    },
+    {
+      id: '5.9',
+      name: 'Set Shipping/Dimensions',
+      method: 'PUT',
+      endpoint: '/api/admin/v1/products/{id}/shipping',
+      request: `{
+  "weight": 0.5,
+  "length": 30.0,
+  "width": 20.0,
+  "height": 10.0,
+  "freeShipping": false,
+  "shippingClass": "standard"
+}`,
+      response: `{
+  "success": true,
+  "message": "Shipping updated",
+  "data": { "weight": 0.5, "length": 30, "width": 20, "height": 10 }
+}`,
+      validation: [
+        { field: 'weight', type: 'BigDecimal', required: false, rules: '> 0' },
+        { field: 'length', type: 'BigDecimal', required: false, rules: '> 0' }
+      ],
+      dbActions: ['Update: Product SET weight, length, width, height, freeShipping, shippingClass'],
+      errors: [],
+      notes: 'Weight in kg, dimensions in cm'
+    },
+    {
+      id: '5.10',
+      name: 'Set SEO Fields',
+      method: 'PUT',
+      endpoint: '/api/admin/v1/products/{id}/seo',
+      request: `{
+  "slug": "nike-air-max-90-white",
+  "metaTitle": "Nike Air Max 90 White | Shop Now",
+  "metaDescription": "Buy Nike Air Max 90 White at the best price..."
+}`,
+      response: `{
+  "success": true,
+  "message": "SEO updated",
+  "data": { "slug": "...", "metaTitle": "...", "metaDescription": "..." }
+}`,
+      validation: [
+        { field: 'slug', type: 'String', required: false, rules: 'Unique, max 200 chars' },
+        { field: 'metaTitle', type: 'String', required: false, rules: 'Max 70 chars' },
+        { field: 'metaDescription', type: 'String', required: false, rules: 'Max 160 chars' }
+      ],
+      dbActions: ['Update: Product SET slug, metaTitle, metaDescription'],
+      cacheActions: ['Delete: product:{id}'],
+      errors: [
+        { code: 'BAD_REQUEST', message: 'Slug exists', condition: 'slug not unique' }
+      ],
+      notes: 'Slug used in public URLs, meta fields for search engines'
+    },
+    {
+      id: '5.11',
+      name: 'Set Featured/Visibility',
+      method: 'PUT',
+      endpoint: '/api/admin/v1/products/{id}/visibility',
+      request: `{
+  "featured": true,
+  "visible": true
+}`,
+      response: `{
+  "success": true,
+  "message": "Visibility updated",
+  "data": { "featured": true, "visible": true }
+}`,
+      validation: [
+        { field: 'featured', type: 'Boolean', required: false, rules: 'Default false' },
+        { field: 'visible', type: 'Boolean', required: false, rules: 'Default true' }
+      ],
+      dbActions: ['Update: Product SET featured, visible'],
+      cacheActions: ['Delete: product:{id}'],
+      errors: [],
+      notes: 'featured=show on homepage, visible=show in listings'
+    },
+    {
+      id: '5.12',
+      name: 'Change Status',
+      method: 'PUT',
+      endpoint: '/api/admin/v1/products/{id}/status',
+      request: `{ "status": "ACTIVE" }`,
+      response: `{
+  "success": true,
+  "message": "Status changed",
+  "data": { "status": "ACTIVE" }
+}`,
+      validation: [
+        { field: 'status', type: 'String', required: true, rules: 'DRAFT, PENDING_REVIEW, ACTIVE, INACTIVE, ARCHIVED' }
+      ],
+      dbActions: ['Update: Product SET status'],
+      cacheActions: ['Delete: product:{id}', 'Delete: products:list:*'],
+      errors: [
+        { code: 'BAD_REQUEST', message: 'Invalid status transition', condition: 'Business rule violation' }
+      ],
+      notes: 'May have validation rules for status transitions'
+    },
+    {
+      id: '5.13',
+      name: 'Delete Product',
+      method: 'DELETE',
+      endpoint: '/api/admin/v1/products/{id}',
+      request: 'Path param: product ID',
+      response: `{
+  "success": true,
+  "message": "Product deleted"
+}`,
+      validation: [],
+      dbActions: ['Update: Product SET deleted=true', 'Update: ProductCategory, ProductMedia, ProductTag SET deleted=true'],
+      cacheActions: ['Delete: product:{id}', 'Delete: products:list:*'],
+      errors: [
+        { code: 'NOT_FOUND', message: 'Product not found', condition: 'ID not found' }
+      ],
+      notes: 'Soft delete with cascade to relations'
+    },
+    {
+      id: '5.14',
+      name: 'Bulk Status Change',
+      method: 'PUT',
+      endpoint: '/api/admin/v1/products/bulk/status',
+      request: `{
+  "productIds": ["01ARZ...", "01ARZ..."],
+  "status": "ACTIVE"
+}`,
+      response: `{
+  "success": true,
+  "message": "3 products updated",
+  "data": { "updatedCount": 3 }
+}`,
+      validation: [
+        { field: 'productIds', type: 'Array', required: true, rules: 'Min 1, max 100' },
+        { field: 'status', type: 'String', required: true, rules: 'Valid status enum' }
+      ],
+      dbActions: ['Batch Update: Product SET status WHERE id IN (...)'],
+      cacheActions: ['Delete: products:list:*', 'Delete: product:{id} for each'],
+      errors: [],
+      notes: 'Atomic batch update'
+    },
+    {
+      id: '5.15',
+      name: 'Bulk Delete',
+      method: 'DELETE',
+      endpoint: '/api/admin/v1/products/bulk',
+      request: `{ "productIds": ["01ARZ...", "01ARZ..."] }`,
+      response: `{
+  "success": true,
+  "message": "2 products deleted",
+  "data": { "deletedCount": 2 }
+}`,
+      validation: [
+        { field: 'productIds', type: 'Array', required: true, rules: 'Min 1, max 100' }
+      ],
+      dbActions: ['Batch Update: Product SET deleted=true WHERE id IN (...)'],
+      cacheActions: ['Delete: product:{id} for each'],
+      errors: [],
+      notes: 'Soft delete batch'
+    },
+    {
+      id: '5.16',
+      name: 'Get Product Media',
+      method: 'GET',
+      endpoint: '/api/admin/v1/products/{id}/media',
+      request: 'Query params: role (optional)',
+      response: `{
+  "success": true,
+  "data": {
+    "items": [{
+      "id": "01ARZ...",
+      "media": { "id": "...", "url": "...", "type": "IMAGE" },
+      "role": "COVER",
+      "displayOrder": 0,
+      "altTextOverride": "Nike Air Max Front"
+    }],
+    "total": 5
+  }
+}`,
+      validation: [
+        { field: 'role', type: 'String', required: false, rules: 'MAIN, COVER, GRID, THUMBNAIL, GALLERY, REVIEW' }
+      ],
+      dbActions: ['Select: ProductMedia WHERE product_id', 'Join: Media'],
+      errors: [],
+      notes: 'Returns media with roles, filterable by role'
+    }
+  ]
+},
+{
+  id: 6,
+  name: 'Inventory Management',
+  doc: 'PHASE_6_Inventory_Management.md',
+  tasks: [
+    {
+      id: '6.1',
+      name: 'List Low Stock',
+      method: 'GET',
+      endpoint: '/api/admin/v1/inventory/low-stock',
+      request: 'Query params: limit, offset, threshold',
+      response: `{
+  "success": true,
+  "data": {
+    "items": [{
+      "product": { "id": "...", "name": "Nike Air Max", "sku": "NAM90" },
+      "inventory": { "stockQuantity": 8, "reservedQuantity": 3, "availableQuantity": 5, "lowStock": true }
+    }],
+    "total": 25,
+    "limit": 20,
+    "offset": 0
+  }
+}`,
+      validation: [
+        { field: 'limit', type: 'Integer', required: false, rules: 'Default 20' },
+        { field: 'threshold', type: 'Integer', required: false, rules: 'Override default threshold' }
+      ],
+      dbActions: ['Select: Inventory I, Product P WHERE I.product_id = P.id AND (I.stockQuantity - I.reservedQuantity) <= I.lowStockThreshold'],
+      errors: [],
+      notes: 'Shows products where available (stock - reserved) <= threshold'
+    },
+    {
+      id: '6.2',
+      name: 'Bulk Stock Update',
+      method: 'PUT',
+      endpoint: '/api/admin/v1/inventory/bulk',
+request: `{
+  "items": [
+    { "productId": "01ARZ...", "stockQuantity": 100 },
+    { "productId": "01ARZ...", "stockQuantity": 50 }
+  ]
+}`,
+      response: `{
+  "success": true,
+  "message": "2 products updated",
+  "data": { "updatedCount": 2 }
+}`,
+      validation: [
+        { field: 'items', type: 'Array', required: true, rules: 'Min 1, max 100' },
+        { field: 'items[].productId', type: 'String', required: true, rules: 'Must exist' },
+        { field: 'items[].stockQuantity', type: 'Integer', required: true, rules: '>= 0' }
+      ],
+      dbActions: ['Batch Update: Inventory SET stockQuantity'],
+      cacheActions: ['Delete: product:{id} for each'],
+      errors: [],
+      notes: 'Batch set stock quantity'
+    },
+    {
+      id: '6.3',
+      name: 'Stock Adjustment',
+      method: 'POST',
+      endpoint: '/api/admin/v1/inventory/{productId}/adjust',
+      request: `{
+  "adjustment": -5,
+  "reason": "Damaged in warehouse"
+}`,
+      response: `{
+  "success": true,
+  "message": "Stock adjusted",
+  "data": {
+    "productId": "01ARZ...",
+    "previousQuantity": 50,
+    "adjustment": -5,
+    "newQuantity": 45,
+    "availableQuantity": 40,
+    "lowStock": false
+  }
+}`,
+      validation: [
+        { field: 'adjustment', type: 'Integer', required: true, rules: 'Can be +/-' },
+        { field: 'reason', type: 'String', required: false, rules: 'Max 200 chars' }
+      ],
+      dbActions: ['Select: Inventory', 'Update: stockQuantity = current + adjustment'],
+      cacheActions: ['Delete: product:{id}'],
+      errors: [
+        { code: 'NOT_FOUND', message: 'Product not found', condition: 'ID not found' },
+        { code: 'BAD_REQUEST', message: 'Insufficient stock', condition: 'newQuantity < 0' }
+      ],
+      notes: 'Increment/decrement stock. Cannot go negative.'
+    },
+    {
+      id: '6.4',
+      name: 'Reserve Stock',
+      method: 'POST',
+      endpoint: '/api/admin/v1/inventory/{productId}/reserve',
+      request: `{
+  "quantity": 2,
+  "orderId": "ORD-12345"
+}`,
+      response: `{
+  "success": true,
+  "data": {
+    "productId": "01ARZ...",
+    "reservedQuantity": 7,
+    "availableQuantity": 43,
+    "reservationId": "RES-001"
+  }
+}`,
+      validation: [
+        { field: 'quantity', type: 'Integer', required: true, rules: '> 0' },
+        { field: 'orderId', type: 'String', required: false, rules: 'For tracking' }
+      ],
+      dbActions: ['Select: Inventory', 'Update: reservedQuantity += quantity'],
+      errors: [
+        { code: 'BAD_REQUEST', message: 'Insufficient stock', condition: 'available < quantity' }
+      ],
+      notes: 'Future (Order module). Reserved stock cannot be oversold.'
+    }
+  ]
+}
+];
+
+let state = {
+  tasks: {},
+  expandedPhases: [0, 5],
+  expandedTasks: {},
+  filter: 'all',
+  search: ''
+};
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      state.tasks = parsed.tasks || {};
+      state.expandedPhases = parsed.expandedPhases || [0, 5];
+      state.expandedTasks = parsed.expandedTasks || {};
+    }
+  } catch (e) { console.warn('Load failed:', e); }
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      tasks: state.tasks,
+      expandedPhases: state.expandedPhases,
+      expandedTasks: state.expandedTasks
+    }));
+  } catch (e) { console.warn('Save failed:', e); }
+}
+
+function getTaskStatus(taskId) { return state.tasks[taskId] || 'pending'; }
+
+function setTaskStatus(taskId, status) {
+  state.tasks[taskId] = status;
+  saveState();
+  render();
+}
+
+function toggleTask(taskId) {
+  const current = getTaskStatus(taskId);
+  setTaskStatus(taskId, current === 'completed' ? 'pending' : 'completed');
+}
+
+function toggleInProgress(e) {
+  e.stopPropagation();
+  const taskId = e.target.dataset.id;
+  const current = getTaskStatus(taskId);
+  setTaskStatus(taskId, current === 'in-progress' ? 'pending' : 'in-progress');
+}
+
+function toggleTaskDetails(e) {
+  e.stopPropagation();
+  const taskId = e.target.closest('.task-item').dataset.id;
+  state.expandedTasks[taskId] = !state.expandedTasks[taskId];
+  saveState();
+  render();
+}
+
+function togglePhase(phaseId) {
+  const idx = state.expandedPhases.indexOf(phaseId);
+  if (idx >= 0) state.expandedPhases.splice(idx, 1);
+  else state.expandedPhases.push(phaseId);
+  saveState();
+  render();
+}
+
+function resetAll() {
+  if (confirm('Reset all tasks to pending?')) {
+    state.tasks = {};
+    state.expandedTasks = {};
+    saveState();
+    render();
+  }
+}
+
+function exportData() {
+  const data = JSON.stringify({ tasks: state.tasks, exportedAt: new Date().toISOString() }, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `admin-panel-tasks-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function importData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+        if (data.tasks) { state.tasks = data.tasks; saveState(); render(); }
+      } catch (err) { alert('Invalid file'); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function filterTasks() {
+  state.filter = document.querySelector('.status-pill.active')?.dataset.filter || 'all';
+  state.search = document.getElementById('searchBox').value.toLowerCase();
+  render();
+}
+
+function matchesFilter(task, phase) {
+  if (state.filter !== 'all' && state.filter !== getTaskStatus(task.id)) return false;
+  if (state.search) {
+    const searchStr = `${task.name} ${task.endpoint} ${task.notes || ''} ${phase.name}`.toLowerCase();
+    if (!searchStr.includes(state.search)) return false;
+  }
+  return true;
+}
+
+function getMethodClass(method) {
+  const map = { POST: 'method-post', GET: 'method-get', PUT: 'method-put', DELETE: 'method-delete', SCHEDULED: 'method-put' };
+  return map[method] || 'method-get';
+}
+
+function renderTaskDetails(task) {
+  let html = `<div class="task-details">`;
+
+  if (task.request && task.request !== 'No body - JWT in Authorization header' && task.request !== 'Path param: category ID' && task.request !== 'Path param: brand ID' && task.request !== 'Path param: tag ID' && task.request !== 'Path param: product ID' && task.request !== 'Query params: limit, offset, type, search' && task.request !== 'Query params: limit, offset, parentId, active, search' && task.request !== 'Query params: limit, offset, search' && task.request !== 'Query params: limit, offset, type' && task.request !== 'Query params: limit, offset, threshold' && task.request !== 'Query params: limit, offset, search' && task.request !== 'Query params: limit, offset, status, brandId, categoryId, minPrice, maxPrice' && task.request !== 'Query params: limit, offset, search' && task.request !== 'Query params: limit, offset, search' && task.request !== 'Query params: limit, offset, search' && task.request !== 'Query params: limit, offset, search' && task.request !== 'Query params: limit, offset, search' && task.request !== 'Query params: limit, offset, search' && task.request !== 'Query params: limit, offset, search' && task.request !== 'Query params: limit, offset, search' && task.request !== 'Query params: limit, offset, search' && task.request !== 'Query params: limit, offset, search' && task.request !== 'Query params: limit, offset, search' && task.request !== 'Query params: limit, offset, search' && task.request !== 'Query params: limit, offset, search' && task.request !== 'Query params: limit, offset, search' && task.request !== 'No request - automatic job' && task.request !== 'Query params: role (optional)') {
+    html += `<div class="detail-section"><div class="detail-label">Request Body</div><pre><code>${task.request}</code></pre></div>`;
+  } else if (task.request === 'No body - JWT in Authorization header') {
+    html += `<div class="detail-section"><div class="detail-label">Request</div><div class="detail-value">No body - JWT in <code>Authorization: Bearer &lt;token&gt;</code> header</div></div>`;
+  } else if (task.request === 'No request - automatic job') {
+    html += `<div class="detail-section"><div class="detail-label">Request</div><div class="detail-value">No request - automatic scheduled job</div></div>`;
+  } else if (task.request.startsWith('Path param:') || task.request.startsWith('Query params:')) {
+    html += `<div class="detail-section"><div class="detail-label">Request</div><div class="detail-value">${task.request}</div></div>`;
+  }
+
+  if (task.response) {
+    html += `<div class="detail-section"><div class="detail-label">Response (200)</div><pre><code>${task.response}</code></pre></div>`;
+  }
+
+  if (task.validation && task.validation.length > 0) {
+    html += `<div class="detail-section"><div class="detail-label">Validation</div><table><thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Rules</th></tr></thead><tbody>`;
+    task.validation.forEach(v => {
+      html += `<tr><td>${v.field}</td><td>${v.type}</td><td>${v.required ? 'Yes' : 'No'}</td><td>${v.rules}</td></tr>`;
+    });
+    html += `</tbody></table></div>`;
+  }
+
+  if (task.dbActions && task.dbActions.length > 0) {
+    html += `<div class="detail-section"><div class="detail-label">DB Actions</div><ul>`;
+    task.dbActions.forEach(a => html += `<li><code>${a}</code></li>`);
+    html += `</ul></div>`;
+  }
+
+  if (task.cacheActions && task.cacheActions.length > 0) {
+    html += `<div class="detail-section"><div class="detail-label">Cache Actions</div><ul>`;
+    task.cacheActions.forEach(a => html += `<li><code>${a}</code></li>`);
+    html += `</ul></div>`;
+  }
+
+  if (task.errors && task.errors.length > 0) {
+    html += `<div class="detail-section"><div class="detail-label">Errors</div><table class="error-table"><thead><tr><th>Code</th><th>Message</th><th>Condition</th></tr></thead><tbody>`;
+    task.errors.forEach(e => {
+      html += `<tr><td>${e.code}</td><td>${e.message}</td><td>${e.condition}</td></tr>`;
+    });
+    html += `</tbody></table></div>`;
+  }
+
+  if (task.notes) {
+    html += `<div class="detail-section"><div class="detail-label">Notes</div><div class="detail-value" style="color: var(--warning)">${task.notes}</div></div>`;
+  }
+
+  html += `</div>`;
+  return html;
+}
+
+function render() {
+  const totalTasks = phasesData.reduce((sum, p) => sum + p.tasks.length, 0);
+  const completedTasks = Object.values(state.tasks).filter(s => s === 'completed').length;
+  const inProgressTasks = Object.values(state.tasks).filter(s => s === 'in-progress').length;
+  const pendingTasks = totalTasks - completedTasks - inProgressTasks;
+
+  document.getElementById('stats').innerHTML = `
+    <div class="stat-card"><div class="label">Total</div><div class="value">${totalTasks}</div></div>
+    <div class="stat-card"><div class="label">Completed</div><div class="value success">${completedTasks}</div></div>
+    <div class="stat-card"><div class="label">In Progress</div><div class="value in-progress">${inProgressTasks}</div></div>
+    <div class="stat-card"><div class="label">Pending</div><div class="value pending">${pendingTasks}</div></div>
+  `;
+
+  document.getElementById('countAll').textContent = totalTasks;
+  document.getElementById('countPending').textContent = pendingTasks;
+  document.getElementById('countInProgress').textContent = inProgressTasks;
+  document.getElementById('countCompleted').textContent = completedTasks;
+
+  const percent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+  document.getElementById('overallPercent').textContent = `${percent}%`;
+  document.getElementById('progressFill').style.width = `${percent}%`;
+
+  const grid = document.getElementById('phasesGrid');
+  let html = '';
+
+  for (const phase of phasesData) {
+    const phaseCompleted = phase.tasks.filter(t => getTaskStatus(t.id) === 'completed').length;
+    const isExpanded = state.expandedPhases.includes(phase.id);
+    const visibleTasks = phase.tasks.filter(t => matchesFilter(t, phase));
+
+    if (visibleTasks.length === 0 && (state.filter !== 'all' || state.search)) continue;
+
+    html += `
+      <div class="phase-card ${isExpanded ? 'expanded' : ''}" data-phase="${phase.id}">
+        <div class="phase-header" onclick="togglePhase(${phase.id})">
+          <div class="phase-title">
+            <div class="phase-badge">P${phase.id}</div>
+            <div class="phase-info">
+              <h3>${phase.name}</h3>
+              <div class="meta">${phase.tasks.length} tasks</div>
+            </div>
+          </div>
+          <div class="phase-actions">
+            <span class="phase-progress"><span class="done">${phaseCompleted}</span>/${phase.tasks.length}</span>
+            <a href="${phase.doc}" class="doc-link" onclick="event.stopPropagation()" target="_blank">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+              Doc
+            </a>
+            <div class="phase-toggle">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="phase-content">
+          <div class="task-list">
+            ${visibleTasks.map(task => `
+              <div class="task-item ${getTaskStatus(task.id)} ${state.expandedTasks[task.id] ? 'show-details' : ''}" data-id="${task.id}">
+                <div class="task-header">
+                  <div class="task-checkbox ${getTaskStatus(task.id) === 'completed' ? 'checked' : ''}" onclick="toggleTask('${task.id}')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+                  </div>
+                  <div class="task-main">
+                    <div class="task-top">
+                      <span class="task-name">${task.name}</span>
+                      <span class="task-endpoint"><span class="method ${getMethodClass(task.method)}">${task.method}</span> ${task.endpoint}</span>
+                      ${getTaskStatus(task.id) !== 'pending' ? `<span class="badge badge-${getTaskStatus(task.id).replace('-', '')}">${getTaskStatus(task.id)}</span>` : ''}
+                    </div>
+                  </div>
+                  <div class="task-actions">
+                    <button class="btn-sm btn-sm-inprogress ${getTaskStatus(task.id) === 'in-progress' ? 'active' : ''}" data-id="${task.id}" onclick="toggleInProgress(event)">
+                      ${getTaskStatus(task.id) === 'in-progress' ? 'Stop' : 'In Progress'}
+                    </button>
+                    <button class="btn-sm" onclick="toggleTaskDetails(event)" style="background: var(--bg); color: var(--text-muted);">
+                      ${state.expandedTasks[task.id] ? 'Less' : 'Details'}
+                    </button>
+                  </div>
+                </div>
+                ${renderTaskDetails(task)}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  grid.innerHTML = html;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadState();
+  render();
+
+  document.getElementById('searchBox').addEventListener('input', filterTasks);
+
+  document.querySelectorAll('.status-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      document.querySelectorAll('.status-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      filterTasks();
+    });
+  });
+});
+</script>
+</body>
+</html>
