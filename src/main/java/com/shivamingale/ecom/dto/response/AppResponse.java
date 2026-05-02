@@ -55,4 +55,14 @@ public class AppResponse<T> {
         private String message;
         private Object rejectedValue;
     }
+
+    @Data
+    @Builder
+    public static class ErrorDetailInfo {
+        private String messagingError;
+        private String failingAddress;
+        private String resource;
+        private String exceptionType;
+        private String nullField;
+    }
 }
