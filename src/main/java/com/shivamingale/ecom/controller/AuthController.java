@@ -95,7 +95,7 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> me(@AuthenticationPrincipal UserPrincipal principal) {
-        return ResponseEntity.ok(authService.getCurrentUser(principal));
+    public AppResponse<UserResponse> me(@AuthenticationPrincipal UserPrincipal principal) {
+        return AppResponse.success(authService.getCurrentUser(principal), "User fetched successfully", HttpStatus.OK);
     }
 }

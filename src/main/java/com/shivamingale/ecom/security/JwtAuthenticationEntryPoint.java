@@ -1,17 +1,19 @@
 package com.shivamingale.ecom.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.shivamingale.ecom.dto.response.ErrorResponse;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.Instant;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.shivamingale.ecom.dto.response.AppResponse;
+import com.shivamingale.ecom.dto.response.AppResponse.ErrorDetail;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
@@ -32,14 +34,16 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
 
-        ErrorResponse error = ErrorResponse.builder()
-                .status(HttpStatus.UNAUTHORIZED)
-                .error("Unauthorized")
-                .message("Authentication required. Please provide a valid Bearer token.")
-                .path(request.getRequestURI())
-                .timestamp(Instant.now())
-                .build();
+        AppResponse<Void> errorResponse = AppResponse.error(
+                "Authentication required. Please provide a valid Bearer token.",
+                HttpStatus.UNAUTHORIZED,
+                ErrorDetail.builder()
+                        .code("UNAUTHORIZED")
+                        .details(authException.getMessage())
+                        .path(request.getRequestURI())
+                        .traceId(null)
+                        .build());
 
-        objectMapper.writeValue(response.getOutputStream(), error);
+        objectMapper.writeValue(response.getOutputStream(), errorResponse);
     }
 }

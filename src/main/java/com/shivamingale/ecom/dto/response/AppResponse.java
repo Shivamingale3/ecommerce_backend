@@ -15,7 +15,7 @@ public class AppResponse<T> {
     private String message;
     private Instant timestamp;
     private T data;
-    private Object error;
+    private ErrorDetail error;
 
     public static <T> AppResponse<T> success(T data, String message, HttpStatus status) {
         return AppResponse.<T>builder()
@@ -28,13 +28,31 @@ public class AppResponse<T> {
                 .build();
     }
 
-    public static <T> AppResponse<T> error(String message, HttpStatus status, Object error) {
+    public static <T> AppResponse<T> error(String message, HttpStatus status, ErrorDetail error) {
         return AppResponse.<T>builder()
                 .success(false)
                 .status(status)
                 .message(message)
                 .timestamp(Instant.now())
+                .data(null)
                 .error(error)
                 .build();
+    }
+
+    @Data
+    @Builder
+    public static class ErrorDetail {
+        private String code;
+        private Object details;
+        private String path;
+        private String traceId;
+    }
+
+    @Data
+    @Builder
+    public static class FieldError {
+        private String field;
+        private String message;
+        private Object rejectedValue;
     }
 }
