@@ -3,7 +3,7 @@ services:
     image: postgres:16-alpine
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-invoice_db}
-      POSTGRES_USER: ${POSTGRES_USER:-invoice_user}
+      POSTGRES_USER: ${POSTGRES_USER:-ecom_user}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?required}
     ports:
       - "${POSTGRES_EXPOSED_PORT:-5432}:5432"
@@ -13,7 +13,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "pg_isready -U ${POSTGRES_USER:-invoice_user} -d ${POSTGRES_DB:-invoice_db}",
+          "pg_isready -U ${POSTGRES_USER:-ecom_user} -d ${POSTGRES_DB:-invoice_db}",
         ]
       interval: 10s
       timeout: 5s
@@ -28,16 +28,26 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
+      - "${DEBUG_PORT:-5005}:5005"
       - "${SERVER_PORT:-8080}:8080"
     depends_on:
       postgres:
         condition: service_healthy
       minio:
         condition: service_healthy
+    develop:
+      watch:
+        - path: src/
+          action: rebuild
+        - path: pom.xml
+          action: rebuild
+        - path: compose.yaml
+          action: rebuild
     environment:
+      JAVA_DEBUG_OPTS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
       SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-invoice_db}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-invoice_user}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-ecom_user}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?required}
       JWT_SECRET: ${JWT_SECRET:?required}
       JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-86400000}

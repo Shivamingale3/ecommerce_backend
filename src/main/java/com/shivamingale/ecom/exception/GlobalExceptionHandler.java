@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -124,6 +125,59 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(body);
     }
 
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(
+            DataIntegrityViolationException ex, HttpServletRequest request) {
+
+        String traceId = getTraceId();
+        boolean includeTrace = traceProperties.isEnabled();
+
+        String message = "Data integrity violation";
+        List<ErrorResponse.FieldError> fieldErrors = null;
+
+        Throwable cause = ex.getCause();
+        if (cause instanceof org.hibernate.exception.ConstraintViolationException constraintEx) {
+            String constraintName = constraintEx.getConstraintName();
+            if (constraintName != null) {
+                String columnName = extractColumnFromConstraint(constraintName);
+                String sqlState = constraintEx.getSQLState();
+                if (sqlState != null && sqlState.equals("23502")) {
+                    message = "Required field cannot be null: " + columnName;
+                    fieldErrors = List.of(ErrorResponse.FieldError.builder()
+                            .field(columnName)
+                            .message("This field is required")
+                            .rejectedValue(null)
+                            .build());
+                } else if (sqlState != null && sqlState.equals("23505")) {
+                    message = "Duplicate value for field: " + columnName;
+                    fieldErrors = List.of(ErrorResponse.FieldError.builder()
+                            .field(columnName)
+                            .message("A record with this value already exists")
+                            .rejectedValue(null)
+                            .build());
+                }
+            }
+        }
+
+        log.warn("Data integrity violation at {}: {}", request.getRequestURI(), ex.getMessage());
+
+        ErrorResponse body = ErrorResponse.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .error("Bad Request")
+                .message(message)
+                .path(request.getRequestURI())
+                .traceId(traceId)
+                .timestamp(Instant.now())
+                .fieldErrors(fieldErrors)
+                .build();
+
+        if (includeTrace) {
+            body.setTrace(ex.getMessage());
+        }
+
+        return ResponseEntity.badRequest().body(body);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneric(Exception ex, HttpServletRequest request) {
         String traceId = getTraceId();
@@ -158,5 +212,19 @@ public class GlobalExceptionHandler {
         } catch (Exception e) {
             return "Error";
         }
+    }
+
+    private String extractColumnFromConstraint(String constraintName) {
+        if (constraintName == null) return "unknown";
+        if (constraintName.contains("_")) {
+            String[] parts = constraintName.split("_");
+            for (int i = parts.length - 1; i >= 0; i--) {
+                String part = parts[i].toLowerCase();
+                if (!part.equals("key") && !part.equals("idx") && !part.equals("fkey") && part.length() > 2) {
+                    return part;
+                }
+            }
+        }
+        return constraintName;
     }
 }
