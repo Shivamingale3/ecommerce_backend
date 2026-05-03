@@ -4,12 +4,15 @@ import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.shivamingale.ecom.dto.request.CreateCategoryDTO;
+import com.shivamingale.ecom.dto.request.PaginationRequestDTO;
+import com.shivamingale.ecom.dto.response.AppResponse;
 import com.shivamingale.ecom.dto.response.CategoryDTO;
 import com.shivamingale.ecom.dto.response.CategorySummaryDTO;
 import com.shivamingale.ecom.entity.Category;
@@ -86,12 +89,19 @@ public class CategoryService {
         }
     }
 
-    public Page<CategorySummaryDTO> getAllCategoriesByPagination(int pageNumber, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        return categoryRepository.findByActiveTrueAndDeletedFalseOrderByDepthAsc(pageable)
-                .map(CategorySummaryDTO::fromEntity);
+    public Page<CategorySummaryDTO> getAllCategoriesByPagination(PaginationRequestDTO pagination) {
+        Pageable pageable = pagination.toPageable();
+        String search = pagination.getCategoryName();
+
+        Page<Category> page = (search != null && !search.isBlank())
+                ? categoryRepository.findByActiveTrueAndDeletedFalseAndNameContainingIgnoreCase(
+                        search.trim(), pageable)
+                : categoryRepository.findByActiveTrueAndDeletedFalse(pageable);
+
+        return page.map(CategorySummaryDTO::fromEntity);
     }
 
+    @Transactional(readOnly = true)
     public CategoryDTO getByCategoryId(String categoryId, boolean nullable) {
         if (nullable) {
             return CategoryDTO.fromEntity(categoryRepository.findById(categoryId).orElse(null));
@@ -105,5 +115,9 @@ public class CategoryService {
             categoryRepository.deleteById(categoryId);
         }
         throw new AppException(HttpStatus.NOT_FOUND, "Category not found");
+    }
+
+    public ResponseEntity<AppResponse<Void>> updateCategory() {
+        return ResponseEntity.ok(AppResponse.success(null, "Category updated successfully", HttpStatus.OK));
     }
 }

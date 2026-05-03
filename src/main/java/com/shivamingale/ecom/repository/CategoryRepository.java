@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -30,6 +31,11 @@ public interface CategoryRepository extends BaseRepository<Category> {
 
     Page<Category> findByActiveTrueAndDeletedFalseOrderByDepthAsc(Pageable pageable);
 
+    @EntityGraph(attributePaths = { "image", "parent", "parent.image", "children", "children.image" })
     Page<Category> findByActiveTrueAndDeletedFalse(Pageable pageable);
+
+    @EntityGraph(attributePaths = { "image", "parent", "parent.image", "children", "children.image" })
+    Page<Category> findByActiveTrueAndDeletedFalseAndNameContainingIgnoreCase(
+            String name, Pageable pageable);
 
 }
