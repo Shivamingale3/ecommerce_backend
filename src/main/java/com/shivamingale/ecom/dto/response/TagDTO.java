@@ -1,4 +1,4 @@
-package com.shivamingale.ecom.dto;
+package com.shivamingale.ecom.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.shivamingale.ecom.entity.Tag;
@@ -19,11 +19,12 @@ public class TagDTO {
     private String slug;
 
     public static TagDTO fromEntity(Tag tag) {
-        if (tag == null) return null;
+        if (tag == null)
+            return null;
         return TagDTO.builder()
-            .id(tag.getId())
-            .name(tag.getName())
-            .slug(tag.getSlug())
-            .build();
+                .id(tag.getId())
+                .name(tag.getName())
+                .slug(tag.getSlug())
+                .build();
     }
 }

@@ -1,0 +1,275 @@
+// Ecommerce Backend Database Schema
+// Generated from JPA Entity definitions
+
+// ============================================
+// ENUMS
+// ============================================
+
+Enum ProductStatus {
+    DRAFT
+    PENDING_REVIEW
+    ACTIVE
+    INACTIVE
+    ARCHIVED
+}
+
+Enum MediaType {
+    IMAGE
+    VIDEO
+    AUDIO
+    DOCUMENT
+}
+
+Enum MediaRole {
+    MAIN
+    COVER
+    GRID
+    THUMBNAIL
+    GALLERY
+    REVIEW
+}
+
+Enum Role {
+    ADMIN
+    USER
+    VIEWER
+}
+
+// ============================================
+// TABLES
+// ============================================
+
+// Base fields inherited by all entities:
+// - id (String, ULID, PK)
+// - created_at (Instant)
+// - updated_at (Instant)
+// - version (Long)
+// - deleted (boolean)
+
+Table admins {
+    id varchar(36) [pk, not null]
+    created_at timestamp
+    updated_at timestamp
+    version int
+    deleted boolean [default: false]
+    name varchar(255) [not null]
+    email varchar(255) [unique, not null]
+    mobile varchar(255) [not null]
+    enabled boolean [default: true]
+}
+
+Table users {
+    id varchar(36) [pk, not null]
+    created_at timestamp
+    updated_at timestamp
+    version int
+    deleted boolean [default: false]
+    first_name varchar(255)
+    last_name varchar(255)
+    email varchar(255) [unique, not null]
+    enabled boolean [default: true]
+    account_non_locked boolean [default: true]
+}
+
+Table sign_in_requests {
+    id varchar(36) [pk, not null]
+    created_at timestamp
+    updated_at timestamp
+    version int
+    deleted boolean [default: false]
+    email varchar(255) [not null]
+    otp varchar(255) [not null]
+    valid_till timestamp [not null]
+}
+
+Table admin_sign_in_requests {
+    id varchar(36) [pk, not null]
+    created_at timestamp
+    updated_at timestamp
+    version int
+    deleted boolean [default: false]
+    email varchar(255) [not null]
+    otp varchar(255) [not null]
+    valid_till timestamp [not null]
+}
+
+Table brands {
+    id varchar(36) [pk, not null]
+    created_at timestamp
+    updated_at timestamp
+    version int
+    deleted boolean [default: false]
+    name varchar(255) [not null]
+    slug varchar(255) [unique, not null]
+    description varchar
+    logo_media_id varchar(36)
+}
+
+Table categories {
+    id varchar(36) [pk, not null]
+    created_at timestamp
+    updated_at timestamp
+    version int
+    deleted boolean [default: false]
+    name varchar(255) [not null]
+    slug varchar(255) [unique, not null]
+    description varchar(500)
+    display_order int [default: 0]
+    is_active boolean [default: true]
+    path varchar(500)
+    depth int [default: 0]
+    parent_category_id varchar(36)
+    image_media_id varchar(36)
+}
+
+Table media {
+    id varchar(36) [pk, not null]
+    created_at timestamp
+    updated_at timestamp
+    version int
+    deleted boolean [default: false]
+    name varchar(255) [not null]
+    type varchar(50) [not null]
+    key varchar(255) [not null]
+    url varchar(255)
+    presigned_url varchar(255)
+    presigned_url_expires_at timestamp
+    alt_text varchar(255)
+    file_size bigint
+    mime_type varchar(100)
+    width int
+    height int
+    is_active boolean [default: true]
+}
+
+Table products {
+    id varchar(36) [pk, not null]
+    created_at timestamp
+    updated_at timestamp
+    version int
+    deleted boolean [default: false]
+    name varchar(255) [not null]
+    slug varchar(255) [unique, not null]
+    description varchar
+    status varchar(50) [not null, default: 'DRAFT']
+    price decimal(19, 4) [not null, default: 0]
+    cost decimal(19, 4)
+    sku varchar(255) [unique]
+    barcode varchar(255)
+    weight_grams int
+    length_cm int
+    width_cm int
+    height_cm int
+    meta_title varchar(100)
+    meta_description varchar(300)
+    is_featured boolean [default: false]
+    is_visible boolean [default: true]
+    brand_id varchar(36)
+}
+
+Table inventories {
+    id varchar(36) [pk, not null]
+    created_at timestamp
+    updated_at timestamp
+    version int
+    deleted boolean [default: false]
+    product_id varchar(36) [unique, not null]
+    stock_quantity int [not null, default: 0]
+    reserved_quantity int [not null, default: 0]
+    low_stock_threshold int [default: 10]
+}
+
+Table product_categories {
+    id varchar(36) [pk, not null]
+    created_at timestamp
+    updated_at timestamp
+    version int
+    deleted boolean [default: false]
+    product_id varchar(36) [not null]
+    category_id varchar(36) [not null]
+    is_primary boolean [default: false]
+    display_order int [default: 0]
+    description varchar(500)
+
+    indexes {
+        (product_id, category_id) [unique]
+    }
+}
+
+Table product_media {
+    id varchar(36) [pk, not null]
+    created_at timestamp
+    updated_at timestamp
+    version int
+    deleted boolean [default: false]
+    product_id varchar(36) [not null]
+    media_id varchar(36) [not null]
+    role varchar(50) [not null, default: 'GALLERY']
+    display_order int [default: 0]
+    alt_text_override varchar(255)
+
+    indexes {
+        (product_id, media_id) [unique]
+    }
+}
+
+Table tags {
+    id varchar(36) [pk, not null]
+    created_at timestamp
+    updated_at timestamp
+    version int
+    deleted boolean [default: false]
+    name varchar(255) [not null]
+    slug varchar(255) [unique, not null]
+}
+
+Table product_tags {
+    id varchar(36) [pk, not null]
+    created_at timestamp
+    updated_at timestamp
+    version int
+    deleted boolean [default: false]
+    product_id varchar(36) [not null]
+    tag_id varchar(36) [not null]
+
+    indexes {
+        (product_id, tag_id) [unique]
+    }
+}
+
+// ============================================
+// RELATIONSHIPS
+// ============================================
+
+// Product -> Brand (Many-to-One)
+Ref: products.brand_id > brands.id
+
+// Inventory -> Product (One-to-One, inventory holds FK)
+Ref: inventories.product_id > products.id
+
+// ProductCategory -> Product (Many-to-One)
+Ref: product_categories.product_id > products.id
+
+// ProductCategory -> Category (Many-to-One)
+Ref: product_categories.category_id > categories.id
+
+// ProductMedia -> Product (Many-to-One)
+Ref: product_media.product_id > products.id
+
+// ProductMedia -> Media (Many-to-One)
+Ref: product_media.media_id > media.id
+
+// ProductTag -> Product (Many-to-One)
+Ref: product_tags.product_id > products.id
+
+// ProductTag -> Tag (Many-to-One)
+Ref: product_tags.tag_id > tags.id
+
+// Category self-reference (parent -> children)
+Ref: categories.parent_category_id > categories.id
+
+// Brand -> Media (logo)
+Ref: brands.logo_media_id > media.id
+
+// Category -> Media (image)
+Ref: categories.image_media_id > media.id

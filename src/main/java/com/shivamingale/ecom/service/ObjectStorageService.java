@@ -1,8 +1,12 @@
 package com.shivamingale.ecom.service;
 
 import com.shivamingale.ecom.config.ObjectStorageProperties;
+import com.shivamingale.ecom.exception.AppException;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -23,8 +27,9 @@ public class ObjectStorageService {
     private final S3Client s3Client;
     private final ObjectStorageProperties properties;
 
-    public void uploadFile(String key, MultipartFile file) {
+    public String uploadFile(String key, MultipartFile file) {
         uploadFile(key, file, file.getContentType());
+        return generatePresignedUrl(key, Duration.ofHours(1));
     }
 
     public void uploadFile(String key, MultipartFile file, String contentType) {
@@ -38,11 +43,12 @@ public class ObjectStorageService {
                     .contentDisposition("inline")
                     .build();
 
-            s3Client.putObject(request, software.amazon.awssdk.core.sync.RequestBody.fromInputStream(inputStream, file.getSize()));
+            s3Client.putObject(request,
+                    software.amazon.awssdk.core.sync.RequestBody.fromInputStream(inputStream, file.getSize()));
             log.info("Uploaded file to S3: {} (size: {} bytes)", key, file.getSize());
         } catch (IOException e) {
             log.error("Failed to upload file: {}", key, e);
-            throw new RuntimeException("Failed to upload file to object storage", e);
+            throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload file to object storage");
         }
     }
 
@@ -50,7 +56,6 @@ public class ObjectStorageService {
         ensureBucketExists();
 
         PutObjectRequest request = PutObjectRequest.builder()
-                .bucket(properties.getBucket())
                 .key(key)
                 .contentType(contentType)
                 .contentDisposition("inline")
@@ -89,7 +94,7 @@ public class ObjectStorageService {
             return Optional.empty();
         } catch (Exception e) {
             log.error("Failed to download file: {}", key, e);
-            throw new RuntimeException("Failed to download file from object storage", e);
+            throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to download file from object storage");
         }
     }
 
@@ -106,7 +111,7 @@ public class ObjectStorageService {
             return Optional.empty();
         } catch (Exception e) {
             log.error("Failed to get file stream: {}", key, e);
-            throw new RuntimeException("Failed to get file stream from object storage", e);
+            throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to get file stream from object storage");
         }
     }
 
@@ -121,7 +126,7 @@ public class ObjectStorageService {
             log.info("Deleted file from S3: {}", key);
         } catch (Exception e) {
             log.error("Failed to delete file: {}", key, e);
-            throw new RuntimeException("Failed to delete file from object storage", e);
+            throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete file from object storage");
         }
     }
 
@@ -152,7 +157,7 @@ public class ObjectStorageService {
                     .toString();
         } catch (Exception e) {
             log.error("Failed to generate presigned URL: {}", key, e);
-            throw new RuntimeException("Failed to generate presigned URL", e);
+            throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to generate presigned URL");
         }
     }
 

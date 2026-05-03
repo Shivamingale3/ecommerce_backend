@@ -1,8 +1,10 @@
-package com.shivamingale.ecom.dto;
+package com.shivamingale.ecom.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.shivamingale.ecom.entity.Media;
 import com.shivamingale.ecom.enums.MediaType;
+import com.shivamingale.ecom.service.MediaService;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,16 +25,23 @@ public class MediaDTO {
     private Integer width;
     private Integer height;
 
+    private static MediaService mediaService;
+
+    public static void setMediaService(MediaService mediaService) {
+        MediaDTO.mediaService = mediaService;
+    }
+
     public static MediaDTO fromEntity(Media media) {
-        if (media == null) return null;
+        if (media == null)
+            return null;
         return MediaDTO.builder()
-            .id(media.getId())
-            .name(media.getName())
-            .type(media.getType())
-            .url(media.hasValidPresignedUrl() ? media.getPresignedUrl() : media.getUrl())
-            .altText(media.getAltText())
-            .width(media.getWidth())
-            .height(media.getHeight())
-            .build();
+                .id(media.getId())
+                .name(media.getName())
+                .type(media.getType())
+                .url(mediaService.resolvePresignedUrl(media))
+                .altText(media.getAltText())
+                .width(media.getWidth())
+                .height(media.getHeight())
+                .build();
     }
 }

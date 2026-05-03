@@ -1,4 +1,4 @@
-package com.shivamingale.ecom.dto;
+package com.shivamingale.ecom.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.shivamingale.ecom.entity.Inventory;
@@ -21,13 +21,14 @@ public class InventorySummaryDTO {
     private boolean inStock;
 
     public static InventorySummaryDTO fromEntity(Inventory inventory) {
-        if (inventory == null) return null;
+        if (inventory == null)
+            return null;
         return InventorySummaryDTO.builder()
-            .id(inventory.getId())
-            .stockQuantity(inventory.getStockQuantity())
-            .availableQuantity(inventory.getAvailableQuantity())
-            .lowStock(inventory.isLowStock())
-            .inStock(inventory.isInStock())
-            .build();
+                .id(inventory.getId())
+                .stockQuantity(inventory.getStockQuantity())
+                .availableQuantity(inventory.getAvailableQuantity())
+                .lowStock(inventory.isLowStock())
+                .inStock(inventory.isInStock())
+                .build();
     }
 }

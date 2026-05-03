@@ -1,4 +1,4 @@
-package com.shivamingale.ecom.controller;
+package com.shivamingale.ecom.controller.user;
 
 import java.util.Map;
 

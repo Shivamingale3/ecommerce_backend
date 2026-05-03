@@ -1,4 +1,4 @@
-package com.shivamingale.ecom.dto;
+package com.shivamingale.ecom.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.shivamingale.ecom.entity.ProductCategory;
@@ -21,13 +21,14 @@ public class ProductCategoryDTO {
     private String description;
 
     public static ProductCategoryDTO fromEntity(ProductCategory productCategory) {
-        if (productCategory == null) return null;
+        if (productCategory == null)
+            return null;
         return ProductCategoryDTO.builder()
-            .id(productCategory.getId())
-            .category(CategoryDTO.fromEntity(productCategory.getCategory()))
-            .primary(productCategory.isPrimary())
-            .displayOrder(productCategory.getDisplayOrder())
-            .description(productCategory.getDescription())
-            .build();
+                .id(productCategory.getId())
+                .category(CategoryDTO.fromEntity(productCategory.getCategory()))
+                .primary(productCategory.isPrimary())
+                .displayOrder(productCategory.getDisplayOrder())
+                .description(productCategory.getDescription())
+                .build();
     }
 }

@@ -26,7 +26,7 @@ import lombok.ToString;
 @ToString(exclude = {"children", "parent"})
 public class Category extends BaseEntity {
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     @Column(nullable = false, unique = true)

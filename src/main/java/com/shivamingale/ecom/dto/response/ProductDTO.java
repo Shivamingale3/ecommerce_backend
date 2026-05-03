@@ -1,4 +1,4 @@
-package com.shivamingale.ecom.dto;
+package com.shivamingale.ecom.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.shivamingale.ecom.entity.Product;
@@ -37,27 +37,28 @@ public class ProductDTO {
     private InventorySummaryDTO inventory;
 
     public static ProductDTO fromEntity(Product product) {
-        if (product == null) return null;
+        if (product == null)
+            return null;
         return ProductDTO.builder()
-            .id(product.getId())
-            .name(product.getName())
-            .slug(product.getSlug())
-            .description(product.getDescription())
-            .status(product.getStatus())
-            .price(product.getPrice())
-            .cost(product.getCost())
-            .sku(product.getSku())
-            .barcode(product.getBarcode())
-            .weightGrams(product.getWeightGrams())
-            .lengthCm(product.getLengthCm())
-            .widthCm(product.getWidthCm())
-            .heightCm(product.getHeightCm())
-            .metaTitle(product.getMetaTitle())
-            .metaDescription(product.getMetaDescription())
-            .featured(product.isFeatured())
-            .visible(product.isVisible())
-            .brand(BrandDTO.fromEntity(product.getBrand()))
-            .inventory(InventorySummaryDTO.fromEntity(product.getInventory()))
-            .build();
+                .id(product.getId())
+                .name(product.getName())
+                .slug(product.getSlug())
+                .description(product.getDescription())
+                .status(product.getStatus())
+                .price(product.getPrice())
+                .cost(product.getCost())
+                .sku(product.getSku())
+                .barcode(product.getBarcode())
+                .weightGrams(product.getWeightGrams())
+                .lengthCm(product.getLengthCm())
+                .widthCm(product.getWidthCm())
+                .heightCm(product.getHeightCm())
+                .metaTitle(product.getMetaTitle())
+                .metaDescription(product.getMetaDescription())
+                .featured(product.isFeatured())
+                .visible(product.isVisible())
+                .brand(BrandDTO.fromEntity(product.getBrand()))
+                .inventory(InventorySummaryDTO.fromEntity(product.getInventory()))
+                .build();
     }
 }

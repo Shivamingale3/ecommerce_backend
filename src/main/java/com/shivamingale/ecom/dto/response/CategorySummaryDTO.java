@@ -1,4 +1,4 @@
-package com.shivamingale.ecom.dto;
+package com.shivamingale.ecom.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.shivamingale.ecom.entity.Category;
@@ -22,19 +22,21 @@ public class CategorySummaryDTO {
     private MediaDTO image;
 
     public static CategorySummaryDTO fromEntity(Category category) {
-        if (category == null) return null;
+        if (category == null)
+            return null;
         return CategorySummaryDTO.builder()
-            .id(category.getId())
-            .name(category.getName())
-            .slug(category.getSlug())
-            .image(MediaDTO.fromEntity(category.getImage()))
-            .build();
+                .id(category.getId())
+                .name(category.getName())
+                .slug(category.getSlug())
+                .image(MediaDTO.fromEntity(category.getImage()))
+                .build();
     }
 
     public static List<CategorySummaryDTO> fromEntities(List<Category> categories) {
-        if (categories == null) return null;
+        if (categories == null)
+            return null;
         return categories.stream()
-            .map(CategorySummaryDTO::fromEntity)
-            .collect(Collectors.toList());
+                .map(CategorySummaryDTO::fromEntity)
+                .collect(Collectors.toList());
     }
 }

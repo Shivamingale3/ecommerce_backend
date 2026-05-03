@@ -1,12 +1,14 @@
 package com.shivamingale.ecom.entity;
 
+import java.time.Instant;
+
 import com.shivamingale.ecom.enums.MediaType;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
-import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,9 +34,6 @@ public class Media extends BaseEntity {
     @Column(nullable = false)
     private String key;
 
-    @Column
-    private String url;
-
     @Column(name = "presigned_url")
     private String presignedUrl;
 
@@ -56,13 +55,17 @@ public class Media extends BaseEntity {
     @Column
     private Integer height;
 
+    @Column(name = "is_temporary", nullable = false)
+    @Builder.Default
+    private boolean temporary = true;
+
     @Column(name = "is_active", nullable = false)
     @Builder.Default
     private boolean active = true;
 
     public boolean hasValidPresignedUrl() {
         return presignedUrl != null
-            && presignedUrlExpiresAt != null
-            && Instant.now().isBefore(presignedUrlExpiresAt);
+                && presignedUrlExpiresAt != null
+                && Instant.now().isBefore(presignedUrlExpiresAt);
     }
 }

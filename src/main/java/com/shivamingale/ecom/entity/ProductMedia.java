@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "product_media", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"product_id", "media_id"})
+        @UniqueConstraint(columnNames = { "product_id", "media_id" })
 })
 @Data
 @NoArgsConstructor
@@ -38,7 +38,7 @@ public class ProductMedia extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private MediaRole role = MediaRole.GALLERY;
+    private MediaRole role = MediaRole.PRODUCT_GALLERY;
 
     @Column(name = "display_order")
     @Builder.Default

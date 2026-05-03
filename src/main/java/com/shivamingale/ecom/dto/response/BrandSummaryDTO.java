@@ -1,4 +1,4 @@
-package com.shivamingale.ecom.dto;
+package com.shivamingale.ecom.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.shivamingale.ecom.entity.Brand;
@@ -20,12 +20,13 @@ public class BrandSummaryDTO {
     private MediaDTO logo;
 
     public static BrandSummaryDTO fromEntity(Brand brand) {
-        if (brand == null) return null;
+        if (brand == null)
+            return null;
         return BrandSummaryDTO.builder()
-            .id(brand.getId())
-            .name(brand.getName())
-            .slug(brand.getSlug())
-            .logo(MediaDTO.fromEntity(brand.getLogo()))
-            .build();
+                .id(brand.getId())
+                .name(brand.getName())
+                .slug(brand.getSlug())
+                .logo(MediaDTO.fromEntity(brand.getLogo()))
+                .build();
     }
 }

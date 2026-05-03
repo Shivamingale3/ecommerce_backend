@@ -1,4 +1,4 @@
-package com.shivamingale.ecom.controller;
+package com.shivamingale.ecom.controller.admin;
 
 import java.util.Map;
 
@@ -51,7 +51,8 @@ public class AdminAuthController {
         if (requestId == null || requestId.isBlank())
             throw new AppException(HttpStatus.BAD_REQUEST, "Request ID is required", null);
         return ResponseEntity.ok(
-                AppResponse.success(adminAuthService.resendSignInOtp(email, requestId), "OTP resent successfully", HttpStatus.OK));
+                AppResponse.success(adminAuthService.resendSignInOtp(email, requestId), "OTP resent successfully",
+                        HttpStatus.OK));
     }
 
     @PostMapping("/verify-otp")

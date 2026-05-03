@@ -1,4 +1,4 @@
-package com.shivamingale.ecom.dto;
+package com.shivamingale.ecom.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.shivamingale.ecom.entity.Product;
@@ -29,18 +29,19 @@ public class ProductSummaryDTO {
     private InventorySummaryDTO inventory;
 
     public static ProductSummaryDTO fromEntity(Product product) {
-        if (product == null) return null;
+        if (product == null)
+            return null;
         return ProductSummaryDTO.builder()
-            .id(product.getId())
-            .name(product.getName())
-            .slug(product.getSlug())
-            .price(product.getPrice())
-            .sku(product.getSku())
-            .status(product.getStatus())
-            .featured(product.isFeatured())
-            .visible(product.isVisible())
-            .brand(BrandSummaryDTO.fromEntity(product.getBrand()))
-            .inventory(InventorySummaryDTO.fromEntity(product.getInventory()))
-            .build();
+                .id(product.getId())
+                .name(product.getName())
+                .slug(product.getSlug())
+                .price(product.getPrice())
+                .sku(product.getSku())
+                .status(product.getStatus())
+                .featured(product.isFeatured())
+                .visible(product.isVisible())
+                .brand(BrandSummaryDTO.fromEntity(product.getBrand()))
+                .inventory(InventorySummaryDTO.fromEntity(product.getInventory()))
+                .build();
     }
 }
